@@ -1,0 +1,2033 @@
+[iTC_CC_ATP-SwRS-0053]
+初始化时，ATP读取来自CC data plug的DataPlugContent.CCTrainType信息，生成TrainType。
+
+[iTC_CC_ATP-SwRS-0054]
+初始化时，ATP读取来自CC data plug的DataPlugContent.CCCoreId信息，生成CoreId。
+
+[iTC_CC_ATP-SwRS-0613]
+OtherCoreId，远端车头号
+
+[iTC_CC_ATP-SwRS-0055]
+初始化时，ATP读取来自CC data plug的DataPlugContent.CC_SSID信息，生成SubSystemId。
+
+[iTC_CC_ATP-SwRS-0057]
+根据TrainType类型，车载ATP读取相对应由离线工具生成的带VCP编码的ATP项目配置参数DATA.VES，并进行校验，如果校验正确则生成车载ATP配置数据ATPsetting，其结构如Table 61所示；若校验错误则ATP将不继续运行。
+
+[iTC_CC_ATP-SwRS-0058]
+根据TrainType类型，车载ATP读取由离线工具生成的带VCP编码的线路地图数据DATA.VES，并进行校验，如果校验正确则生成TrackMap， 其结构见[REF11]定义；如果校验错误，则ATP将不继续运行。
+
+[iTC_CC_ATP-SwRS-0755]
+DATA.VES中部分与输入输出相关功能的代码，由离线工具根据项目安全配置数据生成，带有VCP编码，ATP在初始化时读取使用，生成Offline结构如Table 63所示，详见[REF11]。
+
+[iTC_CC_ATP-SwRS-0536]
+SafeApplicationVersion，ATP软件的版本号。ATP软件应当在代码中定义软件的版本号，每次修改代码时，更新该版本号。
+
+[iTC_CC_ATP-SwRS-0537]
+IdenticalVersionOfDualCPU，ATP软件在获取了data plug和离线数参数及线路地图后，需与另一个模块进行比较，如果下列内容全都一 致，则设置IdenticalVersionOfDualCPU为True；否则如果任意一项不相同，则设置IdenticalVersionOfDualCPU为False。
+?       TrainType，来自data plug的列车类型；
+?       CoreId，来自data plug的所在车头标识；
+?       SubSystemId，来自data plug的列车标识；
+?       TrackMap，线路地图中相应每个ZC区的版本号；
+?       ATPsetting，配置数据的版本号；
+?       SafeApplicationVersion，ATP软件版本号。
+
+[iTC_CC_ATP-SwRS-0059]
+上述信息均获取正确并且相一致后，生成TrainKnown信息。如果TrainKnown为False，则VIOM将输出全限制状态。
+
+[iTC_CC_ATP-SwRS-0125]
+NonVitalRequestReady，通过与CCNV的通信接口，判断是否收到CCNV的消息NonVitalRequest
+
+[iTC_CC_ATP-SwRS-0126]
+ATOcontrolTimeValid，CCNV消息有效标志，如果超过CCNV_VALIDITY_CYCLES个周期仍未收到新的CCNV消息，则设置为False。
+
+[iTC_CC_ATP-SwRS-0468]
+VIOM1VitalInputsReceived，ATP判断是否收到了来自VIOM1的安全输入消息。
+
+[iTC_CC_ATP-SwRS-0060]
+VIOM1VitalInputsAvailable，通过通信接口，获取来自VIOM1的安全输入消息，并判断消息传输的时间有效性以及顺序的正确性。
+
+[iTC_CC_ATP-SwRS-0740]
+VIOM1VitalInputsLastAge，记录收到最新的END_1端VIOM的存活时间为多少。
+
+[iTC_CC_ATP-SwRS-0572]
+LatestVIOM1LoopHourVIOM，记录当前收到最新的END_1端VIOM的周期时间信息。
+?       初始化时LatestVIOM1LoopHourVIOM为VIOM周期号的最小值0；
+?       如果收到可用的VIOM1信息，或之前的VIOM1消息已无效但又新收到一条VIOM1消息，则将相应的LatestVIOM1LoopHourVIOM设置为新收到消息中的viomLoopHour值；
+?       否则，LatestVIOM1LoopHourVIOM保持不变。
+
+[iTC_CC_ATP-SwRS-0614]
+VIOM2VitalInputsReceived，收到并校验正确来自VIOM2的安全输出消息。
+
+[iTC_CC_ATP-SwRS-0449]
+VIOM2VitalInputsAvailable，通过通信接口，获取来自VIOM2的安全输入消息，并判断消息传输的时间有效性以及顺序的正确性。
+其中ViomId取值为0或1，表示位于END_2车头2个VIOM中的1个。
+[iTC_CC_ATP-SwRS-0741]
+VIOM2VitalInputsLastAge，记录当前收到最新的END_2端VIOM的周期时间信息。
+
+[iTC_CC_ATP-SwRS-0573]
+LatestVIOM2LoopHourVIOM，记录当前收到最新的END_2端VIOM的周期时间信息。
+?       初始化时LatestVIOM2LoopHourVIOM为VIOM周期号的最小值0；
+?       如果收到可用的VIOM2信息，或之前的VIOM2消息已无效但又新收到一条VIOM2消息，则将相应的LatestVIOM2LoopHourVIOM设置为新收到消息中的ViomLoopHour值；
+?       否则，LatestVIOM2LoopHourVIOM保持不变。
+
+[iTC_CC_ATP-SwRS-0538]
+VIOM1VitalInputsValid，判断来自END_1的VIOM安全输入信息是否在有效时间内。
+
+[iTC_CC_ATP-SwRS-0539]
+VIOM2VitalInputsValid，判断来自END_2的VIOM安全输入信息是否在有效时间内。
+
+[iTC_CC_ATP-SwRS-0061]
+IdenticalInputs， 对于END_1或END_2每个车头的2个VIOM，ATP软件需根据其消息有效性，对它们取“或”，即：
+?       如果同一端车头2个VIOM消息均无效，则该端IdenticalInputs无效；
+?       否则，如果同一端车头只有1个VIOM消息有效，则IdenticalInputs等于该有效的VIOM消息；
+?       否则，如果同一端2个VIOM至少有一个VIOM消息是“允许”状态，则ATP认为IdenticalInputs中该端VIOM的相应端口是“允许状 态”。
+?       否则，ATP认为IdenticalInputs中该端VIOM的相应端口是“限制”状态。
+
+[iTC_CC_ATP-SwRS-0075]
+CoupledByEnd1或CoupledByEnd2，列车两端连挂其他车辆。如果该项目未配置连挂输入的采集，则认为列车未与其他车连挂。其状态来自于项目可配置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0802]
+TrainNotCoupled，列车未与其他车辆连挂。
+
+[iTC_CC_ATP-SwRS-0789]
+TrainCoupledType，根据项目配置，获取当前列车的连挂类型。支持以下四种连挂类型：
+?       TRAIN_COUPLED_UNKNOWN，当前连挂状态无效；
+?       TRAIN_NO_COUPLED，列车未连挂；
+?       TRAIN_COUPLED_END1，列车END_1端连挂；
+?       TRAIN_COUPLED_END2，列车END_2端连挂。
+配置数据中的TrainNotCoupled，TrainCoupledByEnd1和TrainCoupledByEnd2应考虑VIOM消息的有效性
+?       对于单头CC就能采集两端驾驶室连挂状态的项目，两端的VIOM消息中至少有一个有效即可；
+?       对于单头CC仅采集本端连挂状态的项目，两端VIOM消息必须全有效，才能判断连挂状态有效。
+当不满足上述条件，即VIOM消息无效时，TrainCoupledType应当是TRAIN_COUPLED_UNKNOWN状态。
+
+[iTC_CC_ATP-SwRS-0790]
+CoupledTypeInconsistent，比较列车类型与当前列车的连挂类型是否一致。
+?       初始化时，该值为False；
+?       判断列车类型TrainType与连挂类型TrainCoupledType是否一致：
+-       若不一致，则设置该值为True；
+-       否则，设置该值为False
+?       其他情况，保持不变。
+
+[iTC_CC_ATP-SwRS-0792]
+MatchRebootCondition，是否由于连挂类型改变而设置ATP重启。
+?       初始化时，MatchRebootCondition为False；
+?       当满足以下条件后，ATP将计算新的列车类型TrainType并写入Dataplug，同时设置MatchRebootCondition为True，请求重启ATP 。
+-       CoupledTypeInconsistent为True；
+-       且TrainCoupledType不是TRAIN_COUPLED_UNKNOWN；
+-       且列车处于TrainFilteredStopped状态。
+?       其他情况，MatchRebootCondition保持不变。
+
+[iTC_CC_ATP-SwRS-0144]
+ATPtime，维护本端ATP的loop hour时间。
+?       根据本端CoreId，初始化为END_1或 END_2的初始值；
+?       如果超过了相应的最大值，则重新等于初始化的值。
+?       否则每周期加1
+
+
+[iTC_CC_ATP-SwRS-0615]
+OtherATPmessageReceived，本周期收到冗余ATP消息并校验正确。
+
+[iTC_CC_ATP-SwRS-0078]
+OtherATPmessageAvailable，判断来自冗余ATP消息的有效性：
+
+[iTC_CC_ATP-SwRS-0616]
+LastOtherATPmessageAge，获取到的远端ATP消息的存活时间。
+
+[iTC_CC_ATP-SwRS-0540]
+OtherATPmessageValid，接收到的冗余ATP消息是否在有效期内。如果该消息已失效，则设置OtherATPmessageValid为False；否则为True。
+
+[iTC_CC_ATP-SwRS-0081]
+OtherATPminTime，本端ATP维护的冗余ATP的最小时间。设置规则如下：
+?       初始化时根据所在车头设置OtherATPminTime为默认值；
+?       否则，如果本周期收新的冗余ATP消息可用，则更新OtherATPminTime为消息中的currentTime；
+?       否则，如果冗余ATP消息仍然在有效期内，则对OtherATPminTime每周期加1，若越界则重新等于初始化值；
+?       否则，如果当前收到的新的冗余ATP消息（但不可用），则将OtherATPminTime更新为消息中的时间；
+?       其他情况，OtherATPminTime累加1，若越界则重新等于初始化值。
+
+[iTC_CC_ATP-SwRS-0083]
+OtherATPmaxTime，维护冗余ATP的最大时间。
+
+[iTC_CC_ATP-SwRS-0080]
+OtherATP，解析并存储远端ATP的消息。
+?       初始化或者远端消息过期时，设置相应的值为默认状态；
+?       当本周期收到新的远端消息时，将其设置为新收到消息的值；
+?       否则，保持不变
+
+[iTC_CC_ATP-SwRS-0067]
+BlockModeUsed，当前是否现在选择BM模式。其状态来自于项目可配置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0066]
+BMvariantValidWhileTemporallyValid，当前是否使用BM变量。其状态来自于项目可配置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0146]
+BeaconVariantsUpdating，判断是否要更新BM变量。
+?       若本周期满足以下所有条件时，则认为需要更新BM变量，设置BeaconVariantsUpdating为True。
+-       当前使用BM变量（BMvariantValidWhileTemporallyValid）；
+-       本周期未停车且收到信标消息且判断该信标带有BM变量；
+-       上周期列车未定位，或该BM信标方向与列车运营方向一致。
+?       否则，设置BeaconVariantsUpdating为False。
+
+[iTC_CC_ATP-SwRS-0617]
+BMbeaconReadAge，记录读取BM信标到当前的时间，默认值为REPORT_AGE_MAX。
+?       如果BM信标变量无效，该值应被设置为默认值，BM信标变量无效的条件如下：
+-       初始化；
+-       或当前不在BM模式(not BMvariantValidWhileTemporallyValid)；
+-       或BMbeaconReadAge已大于ATPsetting.VariantsBMfullValidityTime；
+-       或本周期收到的BM信标（BeaconVariantsUpdating为True）中DefaultMessage为True或BlockModeVariantAvailable为False；
+-       或本周期列车由定位转为失位状态；
+-       或当前使用的BM信标方向与已定位的列车运营方向TrainFrontOrientation不同。
+?       否则，如果本周期更新BM信标，则将该变量的初始值设置为1（因为ATP使用的是上个周期读到的信标信息）。
+?       其他情况，累加该变量。
+
+[iTC_CC_ATP-SwRS-0147]
+BMbeaconVariants[MAX_BM_VARIANT_NB]，存储BLOCK模式下的变量，每个数组元素的结构为ST_BM_VARIANT.
+
+更新规则如下：
+?       如果BMbeaconReadAge大于ATPsetting.VariantsBMfullValidityTime（即为默认值），则设置所有变量BMbeaconVariants为限制状态，认为BM变量无效；
+?       否则，如果本周期BeaconVariantsUpdating为True，则根据线路地图中相应的BM信标，更新每个变量的ValidityTime，LineSection和Index，并使用BeaconMessage.Variants更新变量状态。对于未在该信标中更新的变量，应设置为限制状态。
+?       否则，BM信标变量保持不变。
+假设某BM信标是ATP定位使用的第二个信标，而该BM信标的变量方向与列车实际定位方向相反。由于软件功能模块执行顺序的原因，当ATP获取该BM信标的变量信息时，可能还未判断出列车行驶方向（此时尚未执行到定位模块），因此仍然会存储该信标中的变量及其更新有效期。但在执行EOA计算时，会按照列车运行方向（此时已执行完成了定位模块）向下游搜索限制点。但由于存储的变量方向不同，所有列 车运行方向下游的带变量奇点均为限制状态，因此上述处理不会影响安全。当下一个周期，ATP发现该BM信标的变量方向与运行方向不符 ，将其清除。
+
+[iTC_CC_ATP-SwRS-0618]
+BMbeaconVariantValue，获取来自BM信标中该变量的值，输入索引和周期，若过期为假值
+
+[iTC_CC_ATP-SwRS-0148]
+UsedBMbeaconId用于记录当前所使用的BM变量来自哪个BM信标，判断条件如下：
+?       当初始化，非使用BM变量（not BMvariantValidWhileTemporallyValid），该信标方向与当前车头方向不符，或列车失位时，清除UsedBMbeaconId；
+?       否则，如果收到有效的BM信标，记录该信标id到UsedBMbeaconId；
+?       否则，保持UsedBMbeaconId不变。
+
+[iTC_CC_ATP-SwRS-0619]
+BMvariantValidLastRisingAge, 记录从选择BM模式到当前经过的时间
+
+[iTC_CC_ATP-SwRS-0620]
+CBIvariantReportReceived，ATP软件收到CCNV转发的“CBI variant report”消息，并安全校核字校验正确。
+
+[iTC_CC_ATP-SwRS-0621]
+CBIvariantReportAvailable，联锁消息可用
+
+[iTC_CC_ATP-SwRS-0622]
+CBIvariantReportLastAge，记录最新收到的联锁消息已存活的时间。
+
+[iTC_CC_ATP-SwRS-0623]
+BMcbiVariants, 当来自CBI的变量可用时，存储CBI变量；其他时候保持不变。
+考虑到ATP程序镜像大小和代码执行效率，在设计时最多存储并维护3个CBI的变量消息（由项目设计保证，列车最多跨2个联锁区段）。ATP对于新收到并解析完成的联锁消息存储规则如下：
+?       如果之前已经存储有该联锁消息，则使用新消息将其覆盖；
+?       否则，如果尚有空的存储空间，则将新消息存储在空的位置；
+?       否则，使用新消息覆盖掉既有的3个消息中最旧的联锁消息。
+
+[iTC_CC_ATP-SwRS-0624]
+CBIvariantAge，CBI变量的有效存活时间，最大值为REPORT_AGE_MAX。
+?       该值与CBIvariantReportLastAge的区别是在判断回复远端ATP消息时，使用OtherATPmaxTime进行计算，在判断有效期时导向安 全侧。
+
+[iTC_CC_ATP-SwRS-0625]
+CBIvariantLowValidity，判断是否在CBI无线的短有效期内，用于PZ的监控。 在CBTC或者使用来自BM信标变量的情况下，该值为真。
+
+[iTC_CC_ATP-SwRS-0626]
+BMcbiVariantValue，根据联锁变量索引，获得CBI的变量。
+
+[iTC_CC_ATP-SwRS-0754]
+AppliedCBIvariantLoopHour，记录当前使用的CBI的变量的CC时间，供CCNV使用。
+
+[iTC_CC_ATP-SwRS-0627]
+CBIvariantMoreAvailableThanBeacon，通过比较最后一次收到的BM信标的有效期，和对应变量所在该联锁区的无线变量，判断对于该变 量，是使用来自CI无线的变量而非来自信标的变量。
+判断条件CBIvariantReportLastAge <= CBIminProductionAge，表明当前使用的无线消息是列车进入BMCP点上游 “Reception Windows”之后收到的新的消息（或者列车还未经过BMCP点），因此可以使用。
+?       若不满足这个条件，表明列车经过了BMCP点，但未在“Reception Windows”内收到新的无线消息，因此不能相信；
+?       此时应使用来自信标的消息（该信标应当布置在Reception Windows之中，且由配置Vital zone保证不能丢失）。
+可参考需求CBIminProductionAgeSinceSSAcrossing和CBIminProductionAge。
+
+[iTC_CC_ATP-SwRS-0628]
+BMvariantValue，统一来自BM信标和CBI无线的BM变量
+
+[iTC_CC_ATP-SwRS-0629]
+BMvariantRemainingTime，BM变量的剩余有效期
+
+[iTC_CC_ATP-SwRS-0630]
+VersionAuthorizationReceived，收到版本授权
+
+
+
+[iTC_CC_ATP-SwRS-0103]
+VersionAuthorizationAvailable，LC版本授权消息可用
+
+[iTC_CC_ATP-SwRS-0453]
+LastVersionReportAge，记录从上次收到LC的版本信息到现在的时间。
+
+[iTC_CC_ATP-SwRS-0104]
+ReceivedVersionMessages，用于存储从LC收到的MAX_ZC_NB个ZC区的授权信息。由于每个ZC分属不同的LC管理，因此收到特定的LC消息时应仅更新其所对应ZC的版本授权状态。
+
+[iTC_CC_ATP-SwRS-0631]
+VersionAuthorizedByLC，获取ZC的版本授权状态
+
+[iTC_CC_ATP-SwRS-0093]
+SameVersionWithDistantCore，比较来自远端ATP的安全软件，项目配置数据，以及线路地图版本号与本端是否一致
+
+[iTC_CC_ATP-SwRS-0632]
+EOAReportReceived，收到EOA消息
+
+[iTC_CC_ATP-SwRS-0105]
+ZCmessageReady，表示本周期收到了有效的来自ZC的EOA和变量消息。
+?       当前时间大于消息中的ccLoopHour
+?       消息中的ccLoopHour+EOA有效期，应大于当前时间
+
+[iTC_CC_ATP-SwRS-0108]
+LastEOAReportAge，数值型，上次发出loc-report的周期数减去EOA在ZC端消耗的时间（CC周期数）。
+
+[iTC_CC_ATP-SwRS-0106]
+EOAgroundAge，数值型，在收到EOA消息时，其时间已经消耗了几个CC的周期。需同时维护WithoutSpaceEoa和普通EOA。
+
+[iTC_CC_ATP-SwRS-0107]
+ReceivedEOAreport，判断当新收到EOA消息的有效期大于之前存储EOA消息有效期时，更新EOA。需同时维护WithoutSpaceEoa和普通EOA。当存储的EOA消息过期后，清除该消息。
+
+
+[iTC_CC_ATP-SwRS-0109]
+VariantGroundAge，将ZC端的变量生存时间转换为CC周期数
+
+[iTC_CC_ATP-SwRS-0633]
+VariantReportReceived，收到ZC变量消息
+
+[iTC_CC_ATP-SwRS-0110]
+ReceivedVariantReport，存储来自ZC的变量消息，如ST_VARIANT_RCV所示，按照LineSection进行存储：
+在CBTC运营模式下，ATP通过解析来自ZC的消息来获取线路上的变量状态。ZC所发送的变量消息以LineSection为单位，可能发送当前ZC区域以及相邻下个ZC区域的LineSection的变量。ATP对于变量的存储和校验以及时间有效性维护，也应以LineSection为单位。
+
+[iTC_CC_ATP-SwRS-0150]
+CBTCvariantValue，维护CBTC下变量的值
+?       如果变量有效期大于当前时间，则使用该变量；否则为限制状态
+
+[iTC_CC_ATP-SwRS-0634]
+VariantValue，统一CBTC和BM下的变量
+
+[iTC_CC_ATP-SwRS-0113]
+使用OdometerImm记录每次中断中的VPBWrite寄存器编码里程计相关属性变化情况，其结构如Table 56所示。
+
+[iTC_CC_ATP-SwRS-0114]
+中断中，当VPB板检测到Top-loc信号后，ATP累加本周期的TopLocCounter；ATP只有当检测到同一个中断中VPB寄存器的Top-loc和BMR信号同时为True时，才设置本中断的OdometerImm.TopLocValid和本周期的BeaconMsgReady为True，并将信标寄存器中的数据存储到BeaconMsgByte[MAX_BEACON_DATA_SIZE]中。
+?       其中，由于上下模块同步算法，可能出现两个第0中断的情况，此时如果第一个第0中断中读到了VPB的TopLocValid，则第二个第0中断不覆盖该Top-loc信息。
+?       在每周期开始，清除BeaconMsgReady和TopLocCounter。
+
+
+[iTC_CC_ATP-SwRS-0557]
+SensorTestFlag，位于CPU1的ATP软件判断是否需进行传感器测试的标志。
+?       判断连续SENSOR_TEST_START_TIME时间VPB寄存器CBKWrite.CogCounterReg未发生变化；
+?       且之前SensorTestFlag为False；
+?       且当前WheelFilteredStopped为False。
+则位于VLE-2板CPU1的ATP软件，需设置SensorTestFlag为True，并将其发送给位于CPU2的ATP软件。
+
+[iTC_CC_ATP-SwRS-0558]
+对于VLE-2板上CPU1的ATP软件，如果判断上周期末时的SensorTestFlag为True，则从本周期开始，需在每次中断中按照既定测试序列设置OdometerImm.D1/D2/D3的值，并在相应中断中设置SensorTesting标志为True。
+?       在一个周期的中断中，应当每间隔1个中断发送一次D1/2/3全为POWER_ON；
+?       其余中断中，D1/2/3可为POWER_ON或POWER_OFF随机值。
+
+[iTC_CC_ATP-SwRS-0559]
+对于VLE-2板CPU-2的ATP软件，如果收到来自CPU1的SensorTestFlag为True时，需通过读取VPB-2板的D1/2/3寄存器，获取当前测试的D1/2/3值。
+
+[iTC_CC_ATP-SwRS-0115]
+在传感器测试过程中，对于VLE-2板的2个CPU上的ATP软件，均需检测收到的C1/2/3三路传感器测试结果与上次中断中的结果是否一致，依次判断编码里程计传感器状态A1，A2和A3：
+在中断i中，用于判断单个的传感器1/2/3是处于SENSOR_CONDUCT还是SENSOR_BLOCKED状态，用Ai表示，条件如下：
+?       if D(i-1)= POWER_OFF & Ci=LOW_LEVEL，保持上次测试的状态，Ai = Ai(t-1)
+根据上述三个传感器的判断结果，判断编码里程计的状态，条件如下：
+?       A1/2/3中有任意一个为SENSOR_WRONG，则编码里程计错误，设置本中断的OdometerImm.TestResult为TEST_INCONSISTENT；
+?       A1/2/3全都为SENSOR_CONDUCT状态，则编码里程计错误，设置本中断的OdometerImm.TestResult为TEST_INCONSISTENT；
+?       A1/2/3全都为SENSOR_BLOCKED状态，则编码里程计错误，设置本中断的OdometerImm.TestResult为TEST_INCONSISTENT；
+?       A1/2/3全都与上次中断中的A1/2/3状态一致，则认为里程计所在车轴静止，设置本中断的OdometerImm.TestResult为TEST_STOPPING；
+?       如果中断在TEST_STOPPING状态超过SENSOR_TEST_IMMOBILE_THRESHOLD时间，则认为里程计完全静止，ATP设置此中断的OdometerImm.TestResult为TEST_IMMOBILE。
+?       A1/2/3中有任意一个的状态与上次中断中的状态不一致，则认为里程计所在车轴移动，设置本中断的OdometerImm.TestResult为TEST_FLOATING。
+当检测到TEST_INCONSISTENT或者TEST_FLOATING时，停止传感器测试，设置当前中断的OdometerImm.SensorTesting标志为False，并设置本周期的SensorTestFlag为False。
+由于设计限制，只有VPB-2板的上模块向传感器发送D1/2/3测试序列，同时将该测试序列转发给VPB-2板的下模块，供VLE-2板的CPU2读取 。VPB-2板上下模块对于传感器测试结果C1/2/3的处理是一致的。
+
+[iTC_CC_ATP-SwRS-0116]
+在指定时刻T_LOCK_ODOMETER，锁存一个主周期所有中断中的OdometerImm到数组LockedOdometer[ATP_INTERRUPT_NB ]中，其下标为所在 中断的ImmediateNb；并使用LockedBeaconMsgReady，LockedTopLocCounter和LockedBeaconMsgByte分别锁存BeaconMsgReady，TopLocCounter和BeaconMsgByte的值供主任务使用。
+
+
+[iTC_CC_ATP-SwRS-0590]
+IdenticalLockedOdometer，上下CPU模块的ATP应当交互上周期中断中锁存的VPB信息，并遵循以下规则进行同步：
+?       对于CogCounter信息：
+-       相同中断中若CogCounter不同，则取较大的作为同步后该中断的结果；
+-       里程计齿号与齿数取值相同CPU的值。
+?       对于TopLocValid信息：
+-       ATP应检查top-loc发生时VPB锁存的门闩寄存器锁存值CalCogCounter是否在该中断的CogCounter和上个中断的CogCounter之间，若不在上述范围之间，则认为top-loc无效；
+-       如果上下模块相差1个中断，则取前一个中断作为计算CogPositionBeforeTopLoc的依据，而后一个中断作为计算CogPositionAfterTopLoc的依据；
+-       如果两个TopLocValid相差超过1个中断，则ATP认为该top-loc无效。
+
+[iTC_CC_ATP-SwRS-0120]
+BeaconChecksumFailure，判断信标消息校核字是否正确。
+?       主任务中，如果发现中断中LockedBeaconMsgReady为True，则需对LockedBeaconMsgByte信息进行校验，包括根据上周期或上上 周期的ATCkey检测信标消息实时性，并计算信标的SACEM校核字。
+-       如果校验错误，则设置 BeaconChecksumFailure为True
+-       如果校验正确，则设置 BeaconChecksumFailure为False。
+?       如果本周期LockedBeaconMsgReady为False，则设置BeaconChecksumFailure为False。
+
+[iTC_CC_ATP-SwRS-0117]
+在ATP主任务中，如果中断中的LockedBeaconMsgReady状态为True，且BeaconChecksumFailure为False，则设置BeaconMessageReceive为True；否则令其为False。其中，如果ATP在一个周期中收到多于一个信标时，仅处理最后一个信标，据此更新BeaconMessageReceive。
+
+[iTC_CC_ATP-SwRS-0118]
+BeaconCount，ATP记录从上电开始，到当前周期共收到多少次Top-loc信号。
+
+[iTC_CC_ATP-SwRS-0119]
+如果本周期BeaconMessageReceive为True，则解析锁存的LockedBeaconMsgByte数组，生成BeaconMessage信息，其结构为ST_BEACON_MSG ：
+
+[iTC_CC_ATP-SwRS-0121]
+如果本周期BeaconMessageReceive为True，则从LockedBeaconMsgByte中获取信标ID，设置BeaconMessage.ID；其他情况保持不变。
+
+[iTC_CC_ATP-SwRS-0122]
+如果本周期BeaconMessageReceive为True，则从LockedBeaconMsgByte中获取变量数据，设置数组BeaconMessage.Variants[MAX_BM_VARIANT_NB]；若本周期未读到新的信标则保持不变。
+其中BM_VARIANTS_BIT_0...BM_VARIANTS_BIT_15表示[REF4]中定义的信标消息中表示BM信标变量的位数。
+
+[iTC_CC_ATP-SwRS-0123]
+如果本周期BeaconMessageReceive为True，则从LockedBeaconMsgByte中判断是否默认消息，设置BeaconMessage.DefaultMessage；若本 周期未读到新的信标则保持不变。
+其中DEFAULT_MESSAGE_BIT表示[REF4]中定义的信标消息中表示信标是否为默认消息的位数。
+
+[iTC_CC_ATP-SwRS-0124]
+如果本周期BeaconMessageReceive为True，则从LockedBeaconMsgByte中判断变量是否可用信息，设置BeaconMessage.BlockModeVariantAvailable；若本周期未读到新的信标则保持不变。
+其中BLOCK_MODE_VARIANT_AVAILABLE_BIT表示[REF4]中定义的信标消息中表示信标所带变量是否可用的位数。
+
+[iTC_CC_ATP-SwRS-0049]
+车载ATP每周期计算得到伪随机数ATCkey，并将其写入VPB-2板相应寄存器，用于区分VPB-2消息的实时性。
+
+[iTC_CC_ATP-SwRS-0767]
+ATP应读取VPB板的CBKWrite.RadarReg信息，供维护诊断使用。
+
+[iTC_CC_ATP-SwRS-0592]
+CompCogCode，ATP软件需要根据编码里程计的码盘特性和旋转方向，计算8个比特的期望齿号值。
+?       当里程计初始化成功时，设置CompCogCode为初始的CogCode。
+?       此后，对中断中转过的每个齿：
+-       如果相邻中断齿数递增，期望齿号由高位向低位右移1个比特，将新的比特C4array[C4ArrayIndex]放在最高位，并更新C4ArrayIndex。
+-       如果相邻中断齿数递减，期望齿号由低位向高位左移1个比特，将新的比特C4array[C4ArrayIndex]放在最低位，并更新C4ArrayIndex。
+其中，C4ArrayIndex为当前对应的齿数索引，取值为0~99。C4array[C4ArrayIndex]为当前齿数对应码盘的通堵状态，1表示导通，0表示 堵住，详见[REF4]。
+
+[iTC_CC_ATP-SwRS-0164]
+OdometerCogPositionReady，根据IdenticalLockedOdometer中锁存各中断的CogCode和ATP主任务计算的期望齿号CompCogCode是否匹配，判断里程计齿数齿号的可用OdometerCogPositionReady状态。
+?       初始化时，设置OdometerCogPositionReady为False。
+?       否则，如果之前OdometerCogPositionReady为False，则只有当ATP检测到车轮反转或者停转（WheelFilteredStopped）后重新转动，使得里程计朝同一个方向连续转过8个齿后，初始化齿数和齿号的匹配关系，并设置OdometerCogPositionReady为True。
+?       否则，如果本周期某中断中的期望齿号CompCogCode与读到的齿号CogCode不相等，则设置OdometerCogPositionReady为False
+?       其他情况，保持OdometerCogPositionReady不变。
+
+[iTC_CC_ATP-SwRS-0165]
+TeethCounter，ATP根据IdenticalLockedOdometer中锁存的最后一个中断的CogCounter变化值，更新TeethCounter，作为主任务使用的里程计齿数值。TeethCounter的计算应考虑里程计安装方向和CogCounter的寄存器取值范围。
+TeethCounter是有符号值。如果TeethCounter大于0，则表示里程计相对于初始位置向列车END_1方向转动；反之如果小于0，则表示里程 计相对于初始位置向列车END_2方向转动。
+
+[iTC_CC_ATP-SwRS-0166]
+CogPositionBeforeTopLoc，CogPositionAfterTopLoc，如果本周期读到信标，则通过IdenticalLockedOdometer计算读到信标瞬间的里程计齿数信息：
+?       使用Top-loc发生的前一个中断的CogCounter来更新CogPositionBeforeTopLoc；
+?       使用Top-loc发生时中断的CogCounter来更新CogPositionAfterTopLoc；
+其他情况，CogPositionBeforeTopLoc和CogPositionAfterTopLoc保持不变。
+其中i表示锁存收到Top-loc信号的那个中断。如果上下CPU收到Top-loc相差1个中断，则使用较早的的中断作为计算CogPositionBeforeTopLoc的依据，而较迟的那个中断作为计算CogPositionAfterTopLoc的依据。
+
+[iTC_CC_ATP-SwRS-0167]
+SensorTestPerformed，当主任务通过锁存的IdenticalLockedOdometer数组发现本周期所有的中断均正在对传感器进行测试时，输出SensorTestPerformed为True。
+否则，输出SensorTestPerformed为False。
+
+[iTC_CC_ATP-SwRS-0464]
+如果本周期SensorTestPerformed为True，即中断在进行传感器测试，需分别判断三路传感器的导通状态SensorSequenceDetected_1，SensorSequenceDetected_2和SensorSequenceDetected _3：
+?       如果该路传感器在本周期所有中断的测试结果均为SENSOR_CONDUCT，则设置相应状态为True；
+?       否则，设置相应传感器状态为False。
+如果本周期SensorTestPerformed为False，则设置三路传感器状态均为False。
+
+[iTC_CC_ATP-SwRS-0168]
+UnconsistentSensorTest，通过检查C1/2/3传感器的一致性，判断里程计故障。
+?       如果在传感器测试中，任意一次中断中的传感器测试的结果为C1/2/3三路全为SENSOR_CONDUCT，或三路全为SENSOR_BLOCKED，或者任意一路为SENSOR_WRONG，则设置本周期UnconsistentSensorTest为True；
+?       或者，在非传感器测试时，如果某中断的C1/2/3三路状态相同（同为导通或同为堵塞），也应设置本周期UnconsistentSensorTest为True；
+?       否则，设置UnconsistentSensorTest为False。
+
+[iTC_CC_ATP-SwRS-0171]
+WheelStopped，如果当前在进行传感器测试，且任一中断中未发生三路全通或全堵错误，且一个周期所有中断内三路传感器的导通状态都与上周期的结果相同时，输出WheelStopped为True。否则为False。
+
+[iTC_CC_ATP-SwRS-0172]
+WheelFilteredStopped，判断本周期车轮是否处于滤过停止状态，规则如下：
+?       如果WheelFilteredStopped上周期为False，而本周期WheelStopped由False变为True，则认为本周期为True。
+-       在此条件下，记录停车时的齿数LastStopCogPosition为当前齿数
+?       WheelFilteredStopped由True变为False的条件：
+-       齿数移动超过1个齿
+
+[iTC_CC_ATP-SwRS-0173]
+MaxCountCogsRunInCycleExceeded，里程计转过齿数不能超过周期最大值，也不能超过的相邻中断的最大值。
+ATPsetting.OdoMaxCogOnCycle，由CC离线工具将里程计允许最大速度，根据项目最大齿距转换的每周期允许转过的最大齿数；
+ATPsetting.OdoMaxCogOnInterrupt，由CC离线工具将里程计允许最大速度，根据项目最小齿距转换的每中断允许转过的最大齿数。
+
+[iTC_CC_ATP-SwRS-0174]
+WheelKinematicsInvalidForCogCount，如果ATP检测到某个中断的齿数转过最大值时，设置齿数计算错误。
+[iTC_CC_ATP-SwRS-0175]
+上电后里程计状态为NOT_INITIALIZED。
+
+[iTC_CC_ATP-SwRS-0176]
+
+[iTC_CC_ATP-SwRS-0177]
+里程计状态由NOT_INITIALIZED变为WAITING_COG_POSITION_CODE_READY的条件是:
+?       上周期在NOT_INITIALIZED；
+?       上周期在WheelFilteredStopped；
+?       本周期未WheelFilteredStopped而且未检测到传感器测试失败
+
+[iTC_CC_ATP-SwRS-0178]
+若检测到传感器三路全通或全堵，则进入INVALID传感器无效
+
+[iTC_CC_ATP-SwRS-0179]
+InitializationTimer，在WAITING_COG_POSITION_CODE_READY状态下累加初始化时间.
+
+[iTC_CC_ATP-SwRS-0180]
+由WAITING_COG_POSITION_CODE_READY转回NOT_INITIALIZED状态的条件：
+
+[iTC_CC_ATP-SwRS-0181]
+由WAITING_COG_POSITION_CODE_READY转入INITIALIZED状态的条件：
+
+[iTC_CC_ATP-SwRS-0182]
+由WAITING_COG_POSITION_CODE_READY转入INVALID的条件：
+
+[iTC_CC_ATP-SwRS-0183]
+在里程计初始化阶段，ATP需根据当前车头激活方向和上周期位移的结果，对本周期位移进行过估处理。
+
+[iTC_CC_ATP-SwRS-0186]
+当上周期里程计已在INITIALIZED状态，并满足以下条件之一时，里程计状态由INITIALIZED变为INVALID：
+?       传感器测试检测出三路全通全堵；
+?       或者，非停车状态，而且齿数齿号也不一致。
+
+[iTC_CC_ATP-SwRS-0187]
+在INITIALIZED状态，如果齿数齿号匹配，则计算车轮最大最小位移依据伪代码中的公式：
+对于车载ATP软件的位移，在齿数齿号匹配的状态下，无论ATP位于END_1还是END_2，也无论激活哪段车头，始终以END_1方向为位移的正 方向。即当位移大于0时，表示列车向END_1端方向运行，反之则向END_2端方向运行。
+
+[iTC_CC_ATP-SwRS-0189]
+在无效状态停车，并未检测到传感器错误，则能回到非初始化状态。
+
+[iTC_CC_ATP-SwRS-0578]
+在里程计无效状态下，ATP直接使用测得值计算车轮位移（因为此时列车运动学失效，后续功能并不使用测得的列车车轮位移）。
+
+[iTC_CC_ATP-SwRS-0170]
+SensorTestContradiction，当里程计读数为0，但中断中却未进行传感器测试时，设置该变量为True，否则为False。
+NoCommunicationWithOdometer，当SensorTestContradiction保持为True超过限定时间后，设置该值为真，表明中断中的传感器测试判断失败。
+
+[iTC_CC_ATP-SwRS-0190]
+ValidWheelKinematic，车轮运动学特性有效.
+
+[iTC_CC_ATP-SwRS-0636]
+WheelMinSpeed，里程计测得车轮最小速度，非负值。
+
+[iTC_CC_ATP-SwRS-0204]
+WheelMaxSpeed，ATP根据里程计测得位移计算车轮最大速度，该值为非负数，并且向上取整。
+
+[iTC_CC_ATP-SwRS-0201]
+InstantaneousWheelAcceleration，在进行最大位移过估算法之前，需计算瞬时车轮加速度（为减少采样周期过短使得采样误差导致的加速度大幅变化，ATP使用相邻2个周期的算术平均加速度作为瞬时加速度）。
+
+[iTC_CC_ATP-SwRS-0202]
+FilteredWheelAcceleration，在进行最大位移过估算法之前，ATP需计算FILTERED_ACCELERATION_NB个周期的滤波平均加速度
+
+[iTC_CC_ATP-SwRS-0203]
+AverageWheelAcceleration，在进行最大位移过估算法之前，ATP需计算AVERAGE_ACCELERATION_NB个周期的平均车轮加速度
+
+[iTC_CC_ATP-SwRS-0205]
+StartBrakingMovementMax，记录由COASTING→BRAKING，COASTING→SLIDING，或BRAKING→SLIDING状态时的最大位移。
+
+[iTC_CC_ATP-SwRS-0226]
+MaxMotionDuringBrakingOrSliding，在制动或者打滑状态下反向运行的最大位移.
+
+[iTC_CC_ATP-SwRS-0227]
+MaxMotionOdometerSignChanged，用于监控是否发生了测得车轮位移反向.
+
+[iTC_CC_ATP-SwRS-0206]
+StartSlidingSpeed，记录由COASTING或BRAKING进入SLIDING状态时的速度。
+
+[iTC_CC_ATP-SwRS-0207]
+TimeInSliding，记录在SLINDING状态下持续了多少个周期.
+
+[iTC_CC_ATP-SwRS-0200]
+对于车辆位移的打滑空转补偿状态MotionOverEstimationState如下：
+?       COASTING, 无打滑发生；
+?       BRAKING, 一般刹车，进行打滑补偿Kslide；
+?       SLIDING, 可补偿的打滑状态；
+?       SKIDDING, 无法靠里程计补偿的打滑或空转状态。
+各个状态的转换关系如Figure 58所示。
+
+
+
+
+
+
+
+
+
+
+
+[iTC_CC_ATP-SwRS-0209]
+当满足以下条件时，MotionOverEstimationState由COASTING转入BRAKING，并执行：
+
+[iTC_CC_ATP-SwRS-0210]
+
+[iTC_CC_ATP-SwRS-0213]
+
+[iTC_CC_ATP-SwRS-0214]
+
+[iTC_CC_ATP-SwRS-0450]
+打滑状态下列车位移的补偿方法基于以下假定：
+由于判断进入SLIDING状态的阈值ATPsetting.SlidingStartAcc为一个较大的减速度（典型值为-2.3m/s^2），在正常制动过程中不可能达到（列车的全常用制动一般略小于-1m/s^2），所以只可能是在紧急制动时，才进入打滑状态。由于紧急制动施加状态下列车牵引被切除 ，而车辆的紧急制动最小保障率绝对值要大于坡度导致的加速度（由项目保证）。所以，在SLIDING过程中，列车的真实速度是逐渐减小 的，不可能出现打滑后车速比打滑前还大的情形。然而，如果测得车轮减速度的绝对值过大，或者在打滑状态下过长时间，则认为打滑补偿算法失效。
+
+[iTC_CC_ATP-SwRS-0451]
+SlidingEnded，判断是否结束打滑状态的条件之一。
+
+[iTC_CC_ATP-SwRS-0218]
+
+[iTC_CC_ATP-SwRS-0452]
+SlidingExcess，测得的加速度在项目配置范围内满足一定时间，是ATP判断过度打滑的必要条件之一。
+
+[iTC_CC_ATP-SwRS-0217]
+由于当前项目应用的车辆都装有ABS防抱死系统，使得在制动时列车的加速度不会连续若干周期小于ATPsetting.SlidingStopAcc。因此，如果某周期瞬间加速度小于ATPsetting.SlidingStopAcc；并且在之后的测得加速度满足SlidingExcess条件，那么，下列两个条件可以同时成立：
+
+[iTC_CC_ATP-SwRS-0220]
+
+[iTC_CC_ATP-SwRS-0735]
+StartBrakingMovementMin，记录由COASTING进入BRAKING，COASTING进入SLIDING，或者BRAKING进入SLIDING状态时的最小位移。
+
+[iTC_CC_ATP-SwRS-0787]
+OverestimatedMotionMin，根据打滑状态机，对里程计测得的最小位移进行补偿。
+?       在BRAKING或SLIDING状态时，由于车辆ABS的作用，会在瞬间释放制动而使得转速突然增大，可能接近但不会大于进入制动状态 时刻的速度。而由于获取里程计读值有1个齿的采样误差，在该误差的作用下，可能会使得测得位移大于进入制动状态时刻的位移，即出 现测得车轮最小位移大于列车最大位移的情形。为防止这种情况，需要对列车最小位移进行调整，即始终使用进入制动状态时刻与测得车轮最小位移中绝对值较小的一个。
+?       其他情况，无需补偿，使用测得位移。
+
+[iTC_CC_ATP-SwRS-0788]
+OverestimatedMotionMax，根据打滑状态机，对里程计测得的最大位移进行补偿。
+
+如果本周期在BRAKING状态，按如下规则更新列车最大位移：
+?       如果本周期测得车轮位移与StartBrakingMovementMax方向相同，且前者的绝对值大于后者的绝对值，表明由于采样齿数波动， 测得位移大于StartBrakingMovementMax，此时使用测得位移作为最大列车位移；
+?       否则，根据配置对测得位移进行补偿，取StartBrakingMovementMax与补偿后的测得位移中绝对值较小的一个，位移方向与StartBrakingMovementMax相同。
+如果本周期在SLIDING状态时，按如下规则更新列车最大位移：
+?       如果本周期测得车轮位移与StartBrakingMovementMax方向相同，且前者的绝对值大于后者的绝对值，表明由于采样齿数波动， 使得测得位移大于StartBrakingMovementMax。此时使用测得位移作为最大列车位移；
+?       否则，使用StartBrakingMovementMax
+
+其他状态下，无需对测得最大位移进行补偿。
+
+[iTC_CC_ATP-SwRS-0769]
+StartSlippingSpeed，记录由COASTING或MOTORING进入SLIPPING状态时的速度。
+
+[iTC_CC_ATP-SwRS-0770]
+TimeInSlipping，记录在SLIPPING状态下持续了多少个周期.
+
+[iTC_CC_ATP-SwRS-0793]
+OdometerAxleMotorized，表示需考虑里程计所安在车轴牵引导致的空转。
+
+[iTC_CC_ATP-SwRS-0199]
+对于车辆位移的打滑空转补偿状态MotionUnderEstimationState如下：
+?       COASTING, 无打滑发生；
+?       MOTORING，一般牵引状态（仅在需考虑空转补偿的项目）；
+?       SLIPPING，可补偿的空转状态（仅在需考虑空转补偿的项目）；
+?       SKIDDING, 无法靠里程计补偿的打滑或空转状态。
+各个状态的转换关系如Figure 59所示。
+
+[iTC_CC_ATP-SwRS-0771]
+
+[iTC_CC_ATP-SwRS-0772]
+
+[iTC_CC_ATP-SwRS-0773]
+
+[iTC_CC_ATP-SwRS-0774]
+
+[iTC_CC_ATP-SwRS-0775]
+
+[iTC_CC_ATP-SwRS-0776]
+SlippingEnded，判断是否结束空转状态的条件之一。
+
+[iTC_CC_ATP-SwRS-0777]
+
+[iTC_CC_ATP-SwRS-0778]
+SlippingExcess，测得的加速度在项目配置范围内满足一定时间，是ATP判断过度空转的必要条件之一。
+
+[iTC_CC_ATP-SwRS-0779]
+
+[iTC_CC_ATP-SwRS-0794]
+
+[iTC_CC_ATP-SwRS-0780]
+StartMotoringMovementMin，记录由COASTING进入MOTORING，COASTING进入SLIPPING，或者MOTORING进入SLIPPING状态时的最小位移。
+
+[iTC_CC_ATP-SwRS-0795]
+UnderestimatedMotionMin，根据空转状态机，对里程计测得的最小位移进行补偿。
+?       在MOTORING状态下，使用牵引入口位移和将测得位移低估15%补偿后二者较大的一个，作为补偿后的位移。
+?       在SLIPPING状态下，使用牵引入口位移作为补偿后的位移。
+
+[iTC_CC_ATP-SwRS-0796]
+UnderestimatedMotionMax，根据空转状态机，对里程计测得的最大位移进行补偿。
+
+[iTC_CC_ATP-SwRS-0191]
+SlipSlideDetected，是否检测到打滑空转
+
+[iTC_CC_ATP-SwRS-0228]
+SlipSlideModellingFault，打滑补偿模型错误
+
+[iTC_CC_ATP-SwRS-0229]
+ValidSlipSlideModelling，打滑补偿模型有效
+
+[iTC_CC_ATP-SwRS-0797]
+MaximumSScompensatedMotion，经过打滑空转补偿后的最大位移
+
+[iTC_CC_ATP-SwRS-0798]
+MinimumSScompensatedMotion，经过打滑空转补偿后的最小位移
+
+[iTC_CC_ATP-SwRS-0781]
+RadarInfo，ATP软件根据来自VPB板的雷达寄存器，计算雷达信息。
+
+[iTC_CC_ATP-SwRS-0782]
+RadarRawSpeed，直接获取的雷达测速值，该值始终为正。
+
+[iTC_CC_ATP-SwRS-0783]
+RadarDirection，雷达测得方向，向End1方向为+1，向End2为-1，其余为0
+ATP应根据项目配置信息对雷达测得的速度进行过估，方式如下：
+?       当原始测得速度大于配置的阈值ATPsetting.RadarSpeedThreshold时，最大最小位移将分别按照百分比ATPsetting.RadarDeviationAboveThreshold过估；
+?       当原始测得速度小于配置的阈值ATPsetting.RadarSpeedThreshold时，最大最小位移将按照固定速度值ATPsetting.RadarDeviationBelowThreshold过估，速度最小为0。
+
+[iTC_CC_ATP-SwRS-0784]
+RadarMotionMax，绝对值向上过估的雷达最大位移，向END1方向该值为正，向END2方向该值为负。
+
+[iTC_CC_ATP-SwRS-0785]
+RadarMotionMin，绝对值向下过估的雷达最小位移，向END1方向该值为正，向END2方向该值为负。
+仅当项目配置了雷达，且雷达最大最小位移范围与里程计经打滑空转补偿后的最大最小位移范围有交集时，才认为雷达速度有效。现场数据表明，列车持续减速，当里程计读值变为0后，雷达会延迟超过1秒，测速结果才会变为0，此时不能认为雷达测速无效。因此，只有当 雷达测得方向与里程计经打滑补偿后的测得方向相反时，才认为雷达无效。
+
+[iTC_CC_ATP-SwRS-0786]
+RadarSpeedValid，判断雷达速度是否可用
+
+[iTC_CC_ATP-SwRS-0637]
+OdometerSpeedAvailable，当前里程计测速是否可用于参考速度判断
+
+[iTC_CC_ATP-SwRS-0230]
+OdometerSpeedUnderThreshold，本端里程计测速低于阈值。
+
+[iTC_CC_ATP-SwRS-0128]
+ReferenceSpeedUnderThreshold_1，来自CCNV的参考速度1是否小于指定阈值。
+
+[iTC_CC_ATP-SwRS-0129]
+ReferenceSpeedAvailable_1，来自CCNV的参考速度1是否可用
+
+[iTC_CC_ATP-SwRS-0130]
+ReferenceSpeedUnderThreshold_2，来自CCNV的参考速度2是否小于指定阈值。
+
+[iTC_CC_ATP-SwRS-0131]
+ReferenceSpeedAvailable_2，来自CCNV的参考速度2是否可用
+
+[iTC_CC_ATP-SwRS-0231]
+OdometerRef_1.PossiblyDisabled，当本端里程计可用且不为0速，而参考速度1可用但为0速时，则认为参考速度1可能错误
+
+[iTC_CC_ATP-SwRS-0232]
+OdometerRef_2. PossiblyDisabled，当本端里程计可用且不为0速，而参考速度2可用但为0速时，则认为参考速度2可能错误
+
+[iTC_CC_ATP-SwRS-0233]
+OdometerRef_1.PossiblyEnabled，当本端里程计和参考速度1均可用且测得列车在动时，认为参考速度1可能已恢复有效。
+
+[iTC_CC_ATP-SwRS-0234]
+OdometerRef_2.PossiblyEnabled，当本端里程计和参考速度2均可用且测得列车在动时，认为参考速度2可能已恢复有效。
+
+[iTC_CC_ATP-SwRS-0235]
+OdometerRef_1.OutOfOrder，当判断参考速度1可能不可用时，延迟一段时间，若仍不可用，则判断参考速度1失效。
+当判断参考速度1可能可用时，延迟一段时间，若仍可用，则判断参考速度1有效
+
+[iTC_CC_ATP-SwRS-0236]
+OdometerRef_2.OutOfOrder，当判断参考速度2可能不可用时，延迟一段时间，若仍不可用，则判断参考速度2失效。
+当判断参考速度2可能可用时，延迟一段时间，若仍可用，则判断参考速度2有效。
+
+[iTC_CC_ATP-SwRS-0237]
+OdometerRef_1.Contradictory，若参考速度1有效且判断车动，而本端里程计判断车静止，则认为参考速度1判断出里程计可能故障。
+
+[iTC_CC_ATP-SwRS-0238]
+OdometerRef_2. Contradictory，若参考速度2有效且判断车动，而本端里程计判断车静止，则认为参考速度2判断出里程计可能故障。
+
+[iTC_CC_ATP-SwRS-0239]
+AxlePossiblyLocked，在两路参考速度都正常（没有失效out of order）的情况下，当两路参考速度均判断本端里程计可能故障的情况下，认为当前可能轴锁。或者，当有一路参考速度认为轴锁，而另一路参考速度失效或不可用，也认为当前可能轴锁。
+
+[iTC_CC_ATP-SwRS-0240]
+UnrecoverableAxleLocked，当连续若干个周期判断可能轴锁，或者已经判断为轴锁，则永久轴锁.
+
+[iTC_CC_ATP-SwRS-0241]
+AxleLockedDetectionAvailable，只要有一路参考速度可以工作，就认为轴锁侦测可用。
+
+[iTC_CC_ATP-SwRS-0242]
+WheelTrainKinematicCorrelation，车轮和列车的速度一致性
+
+[iTC_CC_ATP-SwRS-0243]
+ValidTrainKinematic，列车位移速度计算有效的条件
+
+[iTC_CC_ATP-SwRS-0212]
+MaximumTrainMotion，根据来自里程计或雷达的信息，计算列车的周期最大位移。该值为矢量，向END_1方向为正，END_2方向为负。
+
+[iTC_CC_ATP-SwRS-0736]
+MinimumTrainMotion，根据来自里程计或雷达的信息，计算列车的周期最小位移。该值为矢量，向END_1方向为正，END_2方向为负。
+
+[iTC_CC_ATP-SwRS-0244]
+
+[iTC_CC_ATP-SwRS-0245]
+TrainFilteredStopped，列车准静止判断。
+
+[iTC_CC_ATP-SwRS-0638]
+TrainHasMoved，表明自上电以后，列车是否移动过。
+
+[iTC_CC_ATP-SwRS-0639]
+TrainMinSpeed，计算列车最小速度。
+其中：
+?       ATPsetting.BrakingMinAcc，为列车制动最小减速度，为负值（即绝对值最大）；
+?       ATPsetting.MaxGradientAcc，为线路中最大坡度加速度，为正值。
+
+[iTC_CC_ATP-SwRS-0246]
+TrainMaxSpeed，考虑打滑过估补偿的列车最大速度，该速度为非负值。
+其中：
+?       ATPsetting.TractionMaxAcc，表示列车在不同车速下的最大牵引力加速度
+如果TrainMinSpeed已经大于配置数据ATPsetting.TractionMaxAcc表中的最大速度值，则应当取ATPsetting.TractionMaxAcc中设置的最 大速度所对应的牵引加速度，作为当前计算使用的最大牵引加速度。根据车辆牵引特性，高速情况牵引能力随着速度的增加而减小，因此，取比当前车速低的速度所对应的牵引加速度是导向安全的。
+
+[iTC_CC_ATP-SwRS-0640]
+NewBeaconObtained，表明收到了可用的RB
+
+[iTC_CC_ATP-SwRS-0641]
+BeaconBeforeLastObtained，记录读到的次新的信标
+
+[iTC_CC_ATP-SwRS-0642]
+BeaconLastObtained，记录读到的最新的信标
+
+[iTC_CC_ATP-SwRS-0247]
+在本周期的里程计和测速信息有效的情况下，需要根据当前齿数和锁存的读到信标时的Top-loc信息，计算DistLastBeaconMax和DistLastBeaconMin，表示当前经过信标后已运行的最大最小距离。
+根据里程计状态和列车位移方向，对列车运行方向的判断如下：
+?       如果里程计还未初始化，则不能判断出正确的里程计转动方向，即认为列车既向END_1也向END_2方向运行；
+?       否则，当里程计初始化后：
+-       如果列车最小位移为0，认为列车既不向END_1也不向END_2方向运行；
+-       如果列车最小位移大于0，则认为列车向END_1方向运行；
+-       如果列车最小位移小于0，则认为列车向END_2方向运行。
+
+[iTC_CC_ATP-SwRS-0635]
+End2RunningForward，根据车轮旋转方向，判断列车是否向END_2方向运行
+
+[iTC_CC_ATP-SwRS-0758]
+End1RunningForward，根据车轮旋转方向，判断列车是否向END_1方向运行
+
+[iTC_CC_ATP-SwRS-0192]
+如Figure 510所示，里程计齿距校准CalibrationState分为以下四个状态:
+?       CALI_WAITING, 未校准或者未成功校准，等待经过MTIB1后进行校准的状态;
+?       CALI_MEASURING, 经过MTIB1,还未到MTIB2, 正在校准的状态；
+?       CALI_VALIDATING, 经过MTIB2，还未到下个验证RB的状态；
+?       CALI_COMPLETED, 经过验证信标RB，并验证成功，本次校准完成。
+齿距校准过程中需更新下列信息：
+?       MaxCogCalibration, 最大齿距
+?       MinCogCalibration, 最小齿距
+?       CalibrationState, 齿距校准状态
+[iTC_CC_ATP-SwRS-0193]
+在CALI_WATING状态下使用默认齿距值
+
+[iTC_CC_ATP-SwRS-0463]
+当读到线路地图中的MTIB1时，齿距校准状态从CALI_WAITING转入CALI_MEASURING。
+
+[iTC_CC_ATP-SwRS-0194]
+当读到线路地图中与之前MTIB1匹配的MTIB2时，根据经过的齿数值，在ATPsetting中查表得到最大最小齿距，并比较测得的齿距结果：
+?       如果测得的最大最小齿距在理论值范围内，则齿距校准状态从CALI_MEASURING到CALI_VALIDATING；
+?       如果在理论范围外，则状态从CALI_MEASURING转入CALI_WAITING。
+其中最大最小测得齿距是根据校准过程中测得齿数，在离线工具计算的齿数-齿距对照表中查到的：
+其中CaliMinRatio和CaliMaxRatio是离线工具计算的该校准信标所对应的MTIB结构的相关属性，表示该对MTIB的间距与标准间距（21米）的比率，该结构定义见[REF11]。
+
+[iTC_CC_ATP-SwRS-0195]
+如果校准过程中发生下列情况，则从CALI_MEASURING回到CALI_WAITING
+
+[iTC_CC_ATP-SwRS-0196]
+当发生以下情况时，认为校准失败，从CALI_VALIDATING回到CALI_WAITING
+
+[iTC_CC_ATP-SwRS-0197]
+当读到有效的验证信标，并判断之前测得齿距在有效范围内时，认为校准成功，转入CALI_COMPLETED状态；
+否则，校准失败，返回CALI_WATING状态。
+
+[iTC_CC_ATP-SwRS-0198]
+在CALI_COMPLETED状态，最大最小齿距无需再次校准。
+
+[iTC_CC_ATP-SwRS-0461]
+End2OrientationByBeacon，当定位初始化时，通过经过的信标，判断END_2驾驶室所面对的运营方向。
+对于极性车，每个车头的运营方向是固定的，如END_1端车头只能向“上行”运营，作为项目配置存储在ATP数据中。
+对于对于非极性车，当读到信标时，ATP会根据列车运行方向（即向END_2方向运行或者END_1方向运行）和连续两个信标的“指向”来判 断运行方向：
+?       对于两信标间没有灯泡线“极点”的情况
+-       如果列车向END_2方向运行，而先后读到的信标从A到B为“上行”方向，则END_2端为“上行”，如Figure 512所示；
+-       如果列车向END_2方向运行，而先后读到的信标从A到B为“下行”方向，则END_2端为“下行”；
+-       如果列车向END_1方向运行，而先后读到的信标从A到B为“上行”方向，则END_2端为“下行”；
+-       如果列车向END_1方向运行，而先后读到的信标从A到B为“下行”方向，则END_2端为“上行”；
+?       如果相邻两个信标之间有灯泡线的“极点”，则该对信标不能用于方向判别，即无法通过该对信标进行列车定位初始化。
+所谓灯泡线，是指列车无需折返更换驾驶室，即可完成运营方向由上行切换到下行（或反之）的作业线路。如Figure 513所示，若列车车身跨UP极点运行时，则END_1和END_2的方向均为DOWN。
+[iTC_CC_ATP-SwRS-0248]
+BeaconLocation，如果本周期读到了重定位信标（无论是否已经在定位状态），则ATP需根据该信标在线路地图中的坐标计算读到信标时 刻END_2车头的位置：
+UpdateInt2FromExt2，根据Figure 514，通过Ext2定位计算End2端的内侧定位Int2。如果计算范围内有非受控道岔或者轨道尽头，则Int2定位应设置为None。如果Int2与Ext2之间有灯泡线极点，则二者的方向将不同。
+UpdateExt1FromExt2，根据Figure 514，通过Ext2定位计算End1端的外侧定位Ext1。如果计算范围内有非受控道岔或者轨道尽头，则Ext1定位应设置为None。如果Ext1与Ext2之间有灯泡线极点，则二者的方向将相同。
+UpdateInt1FromExt2，根据Figure 514，通过Ext2定位计算End1端的内侧定位Int1。如果计算范围内有非受控道岔或者轨道尽头，则Int1定位应设置为None。如果Int1与Ext2之间有灯泡线极点，则二者的方向将相同。
+如Figure 514所示，表示列车两端车头的内外侧四个定位的关系。
+?       其中对于每一端车头的内外侧定位，其坐标相差一个定位误差长度。
+?       而对于一端的外侧定位和另一端的内侧定位，其坐标相差配置数据中的列车长度。
+?       对于每一个定位，均有其相应的运营方向。注意，如果车身范围内有灯泡线极点，则两端车头的运营方向可能相同。
+
+[iTC_CC_ATP-SwRS-0276]
+MovingInitialByBeacon，是否在信标初始化定位过程中。
+
+[iTC_CC_ATP-SwRS-0280]
+TrainLocatedOnBeacon，列车通过信标进行初始化定位（该值仅在处理信标的周期为True）。如果在定位初始化阶段读到信标，且能够根据该信标的位置计算出列车的定位，（即车身范围内没有轨道边界或未知状态的道岔），即认为初始化定位成功。
+
+[iTC_CC_ATP-SwRS-0597]
+MemorizedLocationAuthorized，项目配置是否授权使用记忆定位
+
+[iTC_CC_ATP-SwRS-0643]
+MemorizedLocationEnable，仅在刚上电车还未动时允许使用记忆定位
+
+[iTC_CC_ATP-SwRS-0644]
+MemorizedLocationAvailable，记忆定位是否可用
+
+[iTC_CC_ATP-SwRS-0645]
+MotionSinceMemorizedLocation，记录自唤醒后运行了多少距离
+
+[iTC_CC_ATP-SwRS-0646]
+TrainPresumablyLocalized，列车使用记忆定位，但还未读到确认信标的状态。待已经通过信标重定位，或者失位后，清除该值。
+[iTC_CC_ATP-SwRS-0647]
+TrainStoppedStartTime，记录开始停车的时间
+
+[iTC_CC_ATP-SwRS-0648]
+TrainLocatedOnOtherATP，本端和远端都在停车状态时，才有可能使用远端定位
+
+[iTC_CC_ATP-SwRS-0649]
+TrainInitialLocation，记录列车通过远端ATP、记忆定位、或信标初始化时的位置。
+?       如果列车失位，则清除该位置
+?       如果列车保持定位，则保留该位置
+
+[iTC_CC_ATP-SwRS-0259]
+LocationBeforeReloc，上周期列车已定位的情况下，使用里程计测得的位移来更新列车定位。
+
+[iTC_CC_ATP-SwRS-0254]
+LocationUntravelable，判断车身范围内是否有线路边界或者状态不符的道岔
+?       当上周期列车定位，并满足以下条件时，本周期设置为True。
+-       如果车尾最小定位到车头最大定位之间存在状态未知的道岔(包括发散或汇聚节点)；
+-       或者，如果车尾最小定位到车头最大定位之间存在变量状态与之前列车位置不符的发散汇聚节点；
+-       或者，轨道边界在列车定位范围内；
+?       否则，设置该值为False。
+
+[iTC_CC_ATP-SwRS-0460]
+InverseLocation，判断END_2车头的外侧和内侧定位顺序是否正确。
+
+
+[iTC_CC_ATP-SwRS-0253]
+LocationUncertaintyExceed，列车定位状态下，每周期计算列车外侧定位和内侧之间的距离是否超过最大允许误差。
+
+[iTC_CC_ATP-SwRS-0650]
+TrainRealignmentOnBeacon，是否在信标上重定位成功
+
+[iTC_CC_ATP-SwRS-0768]
+RealignmentFailed，上周期定位状态下，如果读到新的重定位信标，但ATP根据位移计算的最大最小定位，与通过读到信标位置计算的最大最小定位之间没有交集，则认为重定位失败。
+
+[iTC_CC_ATP-SwRS-0745]
+LocationAfterReloc，经过信标重定位后的列车定位
+
+[iTC_CC_ATP-SwRS-0250]
+LocPermanentFailure，在列车已定位，且未使用非确认的BM变量情况下，若发生重定位失败，则永久失位。
+
+[iTC_CC_ATP-SwRS-0651]
+MotionSinceLastReloc，记录自上次信标重定位后的运行距离绝对值
+
+[iTC_CC_ATP-SwRS-0652]
+CBTCwithoutKnownPath，在CBTC下，若上周期定位path为假，则失位
+
+[iTC_CC_ATP-SwRS-0074]
+TrainUnitIntegrity，任一端车头能保证列车完整性，则认为车辆完整性能被保证。如果该项目未配置列车完整性采集，则认为列车完整性已由车辆保证。其状态来自于项目可配置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0278]
+LocalizationFault用于表明是否发生定位错误。判断条件如下:
+
+[iTC_CC_ATP-SwRS-0283]
+TrainLocalized，表示当前列车是否定位。
+当列车定位初始化后，ATP可根据里程计测得并经打滑补偿和轴锁判断处理的列车位移，每周期更新列车在线路地图中的位置。如果再读 到信标，则ATP可根据该信标的位置对之前的定位进行重新校正。考虑到安全，ATP需维护列车每端车头的外侧和内侧两组定位信息。
+
+[iTC_CC_ATP-SwRS-0258]
+TrainLocation，列车End1和End2端定位。
+分为以下四种情况：
+?       本周期非定位；
+?       本周期刚初始化；
+?       本周期经过信标重定位；
+?       本周期使用位移累加定位。
+
+[iTC_CC_ATP-SwRS-0076]
+DriverInCab_1或DriverInCab_2，如果采集到某端的驾驶室被激活，则ATP认为司机在该端驾驶室。其状态来自于项目可配置的列车输入 采集。
+
+[iTC_CC_ATP-SwRS-0139]
+DriverInTrain，当前是否有司机在车内
+
+[iTC_CC_ATP-SwRS-0127]
+NonVitalSelectedFrontEnd，来自CCNV的车头选择信息
+
+[iTC_CC_ATP-SwRS-0138]
+TrainFrontEnd，判断司机在END_1还是END_2还是由CCNV选择。
+
+[iTC_CC_ATP-SwRS-0281]
+TrainFrontOrientation，列车运营方向.
+
+[iTC_CC_ATP-SwRS-0249]
+TrainFrontLocation，车头定位的更新:
+
+[iTC_CC_ATP-SwRS-0255]
+TrainRearLocation，车尾定位的更新:
+
+[iTC_CC_ATP-SwRS-0757]
+LocationPathKnown，判断列车在Block模式没有移动授权条件下是否经过道岔导致非确认定位。
+
+[iTC_CC_ATP-SwRS-0653]
+TrainLocatedOnKnownPath，判断列车是否定位并已知LocationPathKnown。
+BM下的EOA与LocationPathKnown和TrainLocatedOnKnownPath的关系如下：
+?       BM模式下，只要是之前BM的EOA无效，那么在岔区肯定不能使得LocationPathKnown为True；从而TrainLocatedOnKnownPath为False，BM的EOA也不可能有效；
+?       当出了岔区，又读到信标进行重定位，或者通过记忆定位或远端定位初始化后，LocationPathKnown才能重新变为True ；
+?       而如果之前BM的EOA是有效的，那么进入岔区时LocationPathKnown也不会变为无效。
+列车的定位状态及其相关需求编号，如Figure 515 Train localization state所示，有以下四种状态：
+?       NOT_LOCALIZED，初始非定位状态。
+?       MOVING_INIT，读到一个信标，进入定位初始化状态。
+?       LOCALIZED_NOT_CONFIRMED，已定位，但未确认状态。
+?       LOCALIZED_CONFIRMED，已定位，且已确认定位。
+
+[iTC_CC_ATP-SwRS-0275]
+LocalizationState，列车的定位状态，用于用于维护诊断功能。
+
+[iTC_CC_ATP-SwRS-0654]
+MemLocationNotConfirmed，是否通过本端或远端的记忆定位初始化列车定位，但还未通过重定位信标确认定位。
+
+[iTC_CC_ATP-SwRS-0655]
+LocationUncertaintyExceedTime，记录超过最大定位误差的时间
+计算在误差超过最大范围后，是否经过了LocReport有效期。即表明ZC那边已确保不会再用旧的定位信息
+
+[iTC_CC_ATP-SwRS-0656]
+LocationNotUncertaintyExceed，判断是否还处在最大定位误差的确认时间内
+
+[iTC_CC_ATP-SwRS-0411]
+LocalizedAuthorizationForSweepping，发给ZC的是否定位信息。
+
+[iTC_CC_ATP-SwRS-0412]
+TrainConfirmedLocalized，发给ZC的是否确认定位信息。
+
+
+
+[iTC_CC_ATP-SwRS-0657]
+TrainIncludedInSleepingZone，列车停车后定位完全所在的Sleeping zone
+为避免重复写入记忆定位导致存储空间寿命缩短，由设计保证ATP仅在完全进入休眠区并停车后写一次记忆定位（反之，不满足该条件时 ，也只清除一次记忆定位）。此外，在列车上电后还未移动时，无需重新写入记忆定位（因为此时用的还是原来记忆的定位）。
+
+[iTC_CC_ATP-SwRS-0659]
+WritingMemLocRequest，是否写入记忆定位。
+
+[iTC_CC_ATP-SwRS-0660]
+ClearingMemLocRequest，是否清除记忆定位
+
+[iTC_CC_ATP-SwRS-0661]
+MemLocWritten，写入记忆定位的内容
+
+[iTC_CC_ATP-SwRS-0270]
+RestrictiveSignalOverrun，BM模式下，本周期列车车头最大定位是否冒进限制状态的信号机。
+?       当满足以下所有条件时，ATP认为列车冒进了限制状态的信号机，需设置RestrictiveSignalOverrun为True。
+-       本周期列车已定位，即TrainLocalized为True；
+-       本周期使用BM变量；
+-       上周期RestrictiveSignalOverrun为False；
+-       本周期列车位移MaximumTrainMotion向激活的驾驶室方向运行；
+-       本周期列车车头最大定位TrainFrontLocation经过了一个信号机奇点；
+-       该信号机为限制状态，或者建立了Overlap的状态。
+?       否则，设置RestrictiveSignalOverrun为False。
+[iTC_CC_ATP-SwRS-0662]
+TrainInBMinitialZone，车头最小定位在在BM初始化区域内。
+其中NewBlock.Location表示block的起始位置。
+
+[iTC_CC_ATP-SwRS-0663]
+TrainEnteredInBMinitialZoneAge， 如果列车在BM初始化区域内，则记录已在该区域内运行的时间
+
+[iTC_CC_ATP-SwRS-0664]
+StopAssuredPointCrossed，本周期是否通过了信号机前方的BMCP点
+
+[iTC_CC_ATP-SwRS-0665]
+CBIminProductionAgeSinceSSAcrossing，记录从通过上个BMCP点开始到现在已经过了多长时间
+
+[iTC_CC_ATP-SwRS-0666]
+CBIminProductionAge，对于每个联锁，ATP维护最后收到其变量消息时联锁的最小时间，到现在经过的时间。
+
+[iTC_CC_ATP-SwRS-0667]
+ReceivedVariantsAfterEnteredBMinitialZone，先进入BM初始化区，再收到无线或者信标的变量
+
+[iTC_CC_ATP-SwRS-0504]
+BlockModeEOAvalid，BM下的移动授权是否可用
+
+[iTC_CC_ATP-SwRS-0669]
+TrainInSMIzone，判断当车头最大定位在SMI区域内，且车速小于SMI限速时，可使用ZC的EOA消息中的WithoutSpacingEoa进行监控。
+
+[iTC_CC_ATP-SwRS-0160]
+CBTCmodeEOAvalid，CBTC模式下判断来自ZC的EOA是否有效。
+?       如果在SMI区域内且车速小于SMI限速，则应当使用WithoutSpacingEOA；
+?       否则，应当使用普通的EOA
+对于普通EOA，ZC会检查发送的EOA坐标，确保其在Block长度范围内。而对于布置了SMI区的项目，为使得列车能尽量靠近轨道末端的车档停车，WithoutSpacing类型的EOA坐标可能为负值，或者大于所在Block长度，而其所在BlockID仍为轨道末端的Block。
+
+[iTC_CC_ATP-SwRS-0670]
+CBTCmodeEOAlocation，CBTC下的EOA位置。
+
+[iTC_CC_ATP-SwRS-0671]
+EndOfAuthorityValid，统一BM或CBTC下的EOA是否可用。
+
+[iTC_CC_ATP-SwRS-0141]
+TractionAuthorisedSenseEnd1，如果EOA有效且在END_1方向，则ATP授权列车向END_1方向运行。
+[iTC_CC_ATP-SwRS-0142]
+TractionAuthorisedSenseEnd2，如果EOA有效且在END_2方向，则ATP授权向驾驶室2方向运行。
+
+[iTC_CC_ATP-SwRS-0600]
+BMoverlapReleasableSendable，在BM下且未被ATC切除状态下，通过无线发给CI解锁信息。
+
+[iTC_CC_ATP-SwRS-0673]
+OverlapReleasable，可发送Overlap解锁信息
+
+[iTC_CC_ATP-SwRS-0674]
+CrossedOverlapTimerInitialSignal，即本周期通过一个overlap timer初始化信号机时，返回该信号机奇点
+
+[iTC_CC_ATP-SwRS-0675]
+OverlapTimer，当经过具有Overlap初始化属性的信号机时，将OverlapTimer设置为当时信号机的变量有效期。
+
+[iTC_CC_ATP-SwRS-0676]
+OverlapTimerPermissive，用于判断是否在BM下强制Overlap状态建立.
+
+[iTC_CC_ATP-SwRS-0677]
+NotCoercedRestrictive_1，非强制限制1
+
+[iTC_CC_ATP-SwRS-0678]
+NotCoercedRestrictive_2，非强制限制2
+
+[iTC_CC_ATP-SwRS-0679]
+NotCoercedRestrictive_3，非强制限制3
+
+[iTC_CC_ATP-SwRS-0680]
+NotCoercedRestrictive_4，非强制限制4
+
+[iTC_CC_ATP-SwRS-0681]
+CoercedRestrictive，等于相应的“非强制限制”取反。
+
+[iTC_CC_ATP-SwRS-0682]
+CoercedPermissive_1，强制允许输入1
+
+[iTC_CC_ATP-SwRS-0683]
+CoercedPermissive_2，强制允许输入2
+
+[iTC_CC_ATP-SwRS-0684]
+CoercedPermissive_3，强制允许输入3
+
+
+[iTC_CC_ATP-SwRS-0685]
+CoercedPermissive_4，强制允许输入4
+
+[iTC_CC_ATP-SwRS-0686]
+CoercedPermissive，返回采集到的“强制允许”结果
+
+[iTC_CC_ATP-SwRS-0687]
+TSRreportReceived，收到TSR消息
+
+[iTC_CC_ATP-SwRS-0099]
+TSRreportAvailable，TSR消息可用
+
+[iTC_CC_ATP-SwRS-0688]
+LastTSRreportAge，记录当前使用的TSR消息已经过了多长时间。
+
+由于TSR的解析和校核字计算需要一段时间，正常情况下，CCNV给LC消息发送的间隔应当大于TSR消息解析时间，确保在收到新消息时之前消息已解析完成。但如果在解析过程中又收到新的TSR消息时，应当遵循以下优先级处理：
+?       应当继续解析当前的消息直至完成；
+?       之后，选择与之前处理完成的消息所在不同的LC的消息进行解析；
+?       对于每个LC里，只保留最新的一条消息，使用新消息覆盖旧的。
+
+[iTC_CC_ATP-SwRS-0102]
+ReceivedTSRdatabase，将LC发送的TSR消息报文映射到BLOCK数组中。对于线路上的每个BLOCK，判断其是否有对应的TSR，若有，则更新 其首末点坐标和限速值，其中需将TSR消息中的坐标和速度单位转化为ATP软件使用的坐标和速度单位。
+其中，SetAllBlockAsDefaultTsr表示将线路所有该LC管辖的Block均设置为默认的TSR限速值ATPsetting.TSRdefaultLimitSpeed；
+SetTsrInFirstBlock表示TSR消息中首个Block的TSR设置；
+SetTsrInIntermediateBlock表示TSR消息里中间Block的TSR设置。
+SetTsrInLastBlock表示TSR消息中末尾Block的TSR设置。
+对于TSR的处理，仅支持一个BLOCK上至多有一个TSR的情况，其开始和结束点可以在该BLOCK上的任何位置。不支持一个BLOCK上有多个TSR。
+
+
+[iTC_CC_ATP-SwRS-0309]
+X1TractionCutoff，V1TractionCutoff，在EndOfAuthorityValid为True前提下，ATP根据列车当前最大速度TrainMaxSpeed，当前速度下 的最大牵引力加速度（使用列车最小速度TrainMinSpeed在配置数据中查找），车头最大定位所在Block的坡度最大加速度（来自配置数据），计算出经过 时间后列车行驶的距离和所达到的速度。
+
+[iTC_CC_ATP-SwRS-0310]
+X2EbApplied，V2EbApplied，在EndOfAuthorityValid为True前提下，根据车头最大定位所在Block的坡度最大加速度，计算出经过牵引切除(t1)和EB施加(t2)两部分时间后列车行驶的距离X2EbApplied和达到的速度V2EbApplied。
+
+[iTC_CC_ATP-SwRS-0312]
+TrainEnergy，计算EB施加时刻的列车动能，作为能量监控使用的列车能量。
+
+
+[iTC_CC_ATP-SwRS-0690]
+ZoneVSLNotExceedTrainSpeedLimit，ATP应始终将项目配置的限速值为ATPsetting.MPauthLimitSpeed作为安全速度限制区域。
+?       限制区能量
+
+[iTC_CC_ATP-SwRS-0691]
+ZoneVSLnotExceedPSR，PSR作为区域型限速的情形，ATP应将以下两种类型的PSR作F为限制区域进行监控：
+?       该PSR是车尾最小定位上游的第一个PSR（即从该PSR所在位置到车尾最小定位之间没有其他PSR），如Figure 518中的PSR2；
+?       该PSR位于车尾最小定位下游到EB实际位置之间，如Figure 518中的PSR2,PSR3和PSR4。
+
+[iTC_CC_ATP-SwRS-0692]
+PointVSLnotExceedPSR，PSR作为点型限速的情形
+
+其中，Energy.AccumulationPotentialEnergy表示根据限制点所在坡度或EB最小保障率累加计算目标位置的势能，EB最小保障率应根据所在位置的Grip值（Normal或Reduce）选取ATPsetting.EBguaranteedAccNormalGrip或ATPsetting.EBguaranteedAccReducedGrip。能量计 算的原理和方法见[REF10]。
+当车尾在一个较低的PSR（或TSR）中时，若当前车速小于该PSR限速，而计算出的V2速度大于该PSR限速，按照上述处理方式，也会导致EB，尽管当列车运行到X2位置时，列车也许已经离开了该PSR区域。
+
+[iTC_CC_ATP-SwRS-0693]
+ZoneVSLnotExceedBSR，车身范围内有BSR的情形
+
+[iTC_CC_ATP-SwRS-0694]
+PointVSLnotExceedBSR，列车下游有BSR的情形
+
+[iTC_CC_ATP-SwRS-0069]
+TSRcontrolInhibition，不处理TSR信息。其状态来自于项目可配置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0695]
+ZoneVSLnotExceedTSR，TSR作为区域型限速的情形。即对于从车尾所在Block起始点到EB施加位置内的所有Block，当满足以下条件时，认为列车超过了TSR限速：
+?       未禁止处理TSR信息；
+?       且该Block存在TSR；
+?       且列车定位与该TSR区域有交集；
+?       且计算的列车能量大于上述TSR的限制能量。
+
+其中TSRonBlock表示获取指定Block上TSR的值。
+
+[iTC_CC_ATP-SwRS-0696]
+PointVSLnotExceedTSR，TSR作为点型限速的情形
+
+[iTC_CC_ATP-SwRS-0697]
+ZoneVSLnotExceedOTE，Open track end作为区域型限速的情形
+
+[iTC_CC_ATP-SwRS-0698]
+PointVSLnotExceedOTE，Open track end作为点型限速的情形
+
+
+[iTC_CC_ATP-SwRS-0699]
+ZoneVSLnotExceedCTE，Close track end作为区域型限速的情形
+
+[iTC_CC_ATP-SwRS-0700]
+PointVSLnotExceedCTE，Close track end作为点型限速的情形
+
+[iTC_CC_ATP-SwRS-0701]
+ZoneVSLnotExceedSignal，信号机作为区域型限速的情形
+
+[iTC_CC_ATP-SwRS-0702]
+PointVSLnotExceedSignal，信号机作为点型限速的情形
+
+[iTC_CC_ATP-SwRS-0703]
+ZoneVSLnotExceedOverlap，Overlap作为区域型限速的情形
+
+[iTC_CC_ATP-SwRS-0704]
+PointVSLnotExceedOverlap，Overlap作为点型限速的情形
+
+[iTC_CC_ATP-SwRS-0705]
+ZoneVSLnotExceedSwitch，非受控道岔作为区域型限速的情形
+
+[iTC_CC_ATP-SwRS-0706]
+PointVSLnotExceedSwitch，非受控道岔作为点型限速的情形
+
+[iTC_CC_ATP-SwRS-0707]
+ZoneVSLnotExceedPZ，PZ作为区域型限速。ATP应监控与列车定位有以下两种关系的限制状态保护区：
+?       该保护区的起始点在车尾最小定位到紧急制动施加位置之间；
+?       或，该保护区起始点在车尾最小定位上游，但车尾最小定位在该保护区范围内。
+
+[iTC_CC_ATP-SwRS-0708]
+PointVSLnotExceedPZ，PZ作为点型限速的情形
+
+[iTC_CC_ATP-SwRS-0709]
+ZoneVSLnotExceedPSD，PSD作为区域型限速。ATP应监控与列车定位有以下两种关系的限制状态屏蔽门区域：
+?       该屏蔽门区的起始点在车尾最小定位到紧急制动施加位置之间；
+?       或，该屏蔽门区起始点在车尾最小定位上游，但车尾最小定位在该屏蔽门区范围之内。
+
+[iTC_CC_ATP-SwRS-0710]
+PointVSLnotExceedPSD，PSD作为点型限速的情形
+
+[iTC_CC_ATP-SwRS-0711]
+ZoneVSLnotExceedZC，非授权ZC作为区域型限速的情形
+
+
+[iTC_CC_ATP-SwRS-0712]
+PointVSLnotExceedZC，非授权ZC边界作为点型限速的情形
+其中NewBlock.Location表示该block的起始位置。
+
+[iTC_CC_ATP-SwRS-0713]
+ZoneVSLnotExceedEOA，CBTC下EOA作为区域型限速的情形
+
+[iTC_CC_ATP-SwRS-0714]
+PointVSLnotExceedEOA，CBTC下EOA作为点型限速的情形
+
+ZoneVSLNotExceed，判断有无限制区域超能。
+
+[iTC_CC_ATP-SwRS-0324]
+PointVSLNotExceed，判断有无限制点超能。
+
+[iTC_CC_ATP-SwRS-0064]
+MotionProtectionInhibition，��示ATP不负责列车位置的监控。其状态来自于项目可配置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0325]
+TrainPossiblyInOverEnergy，列车能量大于限制点或限制区能量，即超能。
+
+[iTC_CC_ATP-SwRS-0326]
+TrainEnergyControlDisabled，在RM模式下不报超能。
+
+[iTC_CC_ATP-SwRS-0327]
+EBforOverEnergy，超能后是否输出EB
+
+[iTC_CC_ATP-SwRS-0328]
+PBforOverEnergy，超能停车后是否继续输出PB
+
+[iTC_CC_ATP-SwRS-0292]
+NotOnRestrictiveMoralTimeArea_1，当列车定位时，ATP需判断END_1端车头的内外侧 定位是否与该端车头朝向的“限制状态”信号机下游的模糊时间区有无交集。其中模糊时间区定义为信号机下游长度为ATPsetting.MTdistance的一段范围。
+当满足下列所有条件时，设置NotOnRestrictiveMoralTimeArea_1为True：
+?       列车已确认定位；
+?       并且：
+-       END_1端车头的内外侧定位与END_1端车头朝向的信号机下游模糊区没有交集；
+-       或者，END_1端车头的内外侧定位与END_1端车头朝向的信号机下游模糊区有交集，但该信号机是允许状态。
+否则，应设置NotOnRestrictiveMoralTimeArea_1为False。
+
+[iTC_CC_ATP-SwRS-0293]
+NotOnRestrictiveMoralTimeArea_2，当列车定位时，ATP需判断END_2端车头的内外侧定位是否与该端车头朝向的“限制状态”信号机下 游的模糊时间区有无交集。
+当满足下列所有条件时，设置NotOnRestrictiveMoralTimeArea_2为True：
+?       列车已确认定位；
+?       并且：
+-       END_2端车头的内外侧定位与END_2端车头朝向的信号机下游模糊区没有交集；
+-       或者，END_2端车头的内外侧定位与END_2端车头朝向的信号机下游模糊区有交集，但该信号机是允许状态。
+否则，应设置NotOnRestrictiveMoralTimeArea_2为False。
+
+[iTC_CC_ATP-SwRS-0294]
+RouteExclusivityGuaranted_1，如果列车在车头1对应方向且限制状态的模糊时间区内超过项目设定时间，则ATP应将该值设为限制状态 。其中MoralTimeTimer_1为记录列车在车头1对应方向的限制状态模糊时间区内的时间。
+
+
+[iTC_CC_ATP-SwRS-0295]
+RouteExclusivityGuaranted_2，如果列车在车头2对应方向且限制状态的模糊时间区内超过项目设定时间，则ATP应将该值设置为限制状 态，其中MoralTimeTimer_2为记录列车在车头2对应方向限制状态模糊时间区内的时间。
+
+[iTC_CC_ATP-SwRS-0296]
+HazardousMotionOnNonExclusiveRoute，非RM的BM模式下，如果列车在激活端车头方向的限制状态的Moral Time区停止超时预设时间，则ATP认为当前处于“非独占进路”的风险之中。
+
+
+[iTC_CC_ATP-SwRS-0297]
+PBonNonExclusiveRoute，当由于MoralTime监控导致的停车后，是否保持输出停车制动的取决于项目配置。
+
+[iTC_CC_ATP-SwRS-0298]
+EBonNonExclusiveRoute，如果当前处于“非独占进路”的风险中，且列车在移动，则ATP应当输出EB；如果当前已停车，则是否继续输出EB取决于项目配置。
+
+[iTC_CC_ATP-SwRS-0717]
+PermissiveZoneLogicalInput，允许区逻辑输入。
+
+[iTC_CC_ATP-SwRS-0718]
+NotRestrictiveZoneLogicalInput，非限制区逻辑输入。
+
+[iTC_CC_ATP-SwRS-0582]
+NoUndetectableDanger_1，已监控向END_1方向的运行，其状态来自于项目可配置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0583]
+NoUndetectableDanger_2，其状态来自于项目可配置的列车输入采集。
+在离线数据中，可将PermissiveZoneLogicalInput或NotRestrictiveZoneLogicalInput作为配置数据NoUndetectableDanger_1或NoUndetectableDanger_2的输入变量参与运算，即结合线路上vital zone及其变量的设置，实现NUDE的监控。
+
+[iTC_CC_ATP-SwRS-0285]
+UndetectableDangerRiskForNoNUDE，当前两端车头都没有NUDE输入，则认为列车存在“无法侦测的风险”。
+
+[iTC_CC_ATP-SwRS-0286]
+PBforUndetectableDangerRisk，当停车且存在“无法侦测的风险”时，如果项目配置为输出停车制动，则ATP应当输出停车制动。
+
+[iTC_CC_ATP-SwRS-0287]
+NUDEdistanceAccount_1，监控当司机未授权向END_1方向运行时，列车向END_1方向运行的距离，该值为非负数，
+?       若在初始化阶段，或NUDE1为True，或已经EB并停车，则等于0；
+?       否则，当测速无效时，将其设置为默认值
+?       否则，当里程计已初始化后：
+-       如果MaximumTrainMotion大于0，则等于上周期累加距离加上本周期最大位移，最小取0。
+-       而如果MaximumTrainMotion小于等于0，则使用上周期值加最小位移（实际上就是减小该累加值，倒车），最小取0
+?       否则，保持累加距离不变。
+
+[iTC_CC_ATP-SwRS-0288]
+NUDEdistanceAccount_2，监控当司机未授权向END_2方向运行时，列车向END_2方向运行的距离，该值为非正数，
+?       若在初始化阶段，或NUDE2为True，或已经EB并停车，则等于0；
+?       否则，当测速无效时，将其设置为默认值；
+?       否则，当里程计已经初始化后：
+-       若 MaximumTrainMotion小于0，则等于上周期累加距离加上本周期最大位移，最大取0。
+-       若MaximumTrainMotion大于等于0，则使用上周期值加最小位移，最大取0。
+?       否则，保持累加距离不变。
+
+[iTC_CC_ATP-SwRS-0289]
+UndetectDangerMotionWithoutNUDE，列车运行超过限定距离，但仍有车头未检测到NUDE。
+
+[iTC_CC_ATP-SwRS-0290]
+EBappliedForMotionWithoutNUDE，保证由NUDE导致的EB会延迟一段时间。即：
+?       当UndetectDangerMotionWithoutNUDE为True时，设置EBappliedForMotionWithoutNUDE为True；
+?       当UndetectDangerMotionWithoutNUDE由True变为False后，还需保持EBappliedForMotionWithoutNUDE 在ATPsetting.NUDEtrainStopDurationBeforeEBrelease时间内为True；
+?       超过上述时间后，该值为False。
+
+[iTC_CC_ATP-SwRS-0291]
+EBforUndetectableDangerRisk，由“无法侦测的危险”导致EB并停车后，ATP应当根据项目配置判断是否输出EB。
+
+[iTC_CC_ATP-SwRS-0743]
+ConditionForRMlimitSpeed，当前应用哪种RM限速。ATP最多支持项目配置MAX_RM_CONDITION_NB种RM限速。
+
+[iTC_CC_ATP-SwRS-0744]
+RMlimitSpeedApplied，根据列车输入，判断当前应当监控的RM限速
+在配置数据中，ConditionForRMlimitSpeed必须配置列车的“各种模式”及其相应的“最大”限速。其原因是防止ATP未发现相应模式的 限速时，将RMlimitSpeedApplied设置为0，影响可用性。但对于这些限速的监控，仅在MotionProtectionInhibition时实施。
+
+[iTC_CC_ATP-SwRS-0497]
+NoDangerForRMoverSpeed，列车速度小于等于RM模式下的限速。
+
+[iTC_CC_ATP-SwRS-0734]
+EBforRMoverSpeed，若在RM模式下，列车速度大于RM模式限速，则将输出EB。
+
+[iTC_CC_ATP-SwRS-0751]
+NoDangerForMemorizedLocationOverSpeed，在使用记忆定位而还未读到确认信标时，ATP监控列车速度是否超过项目限制值。
+
+[iTC_CC_ATP-SwRS-0719]
+EBforMemorizedLocationOverSpeed，在使用记忆定位而还未读到确认信标时，ATP应确保列车速度不超过项目限制值。
+
+[iTC_CC_ATP-SwRS-0065]
+RMRselectedDrivingMode，是否选择了RMR倒车模式。其状态来自于项目可配置的列车输入采集。
+列车在非RMR模式下，向激活车头的反向运行，称之为回溜。ATP监控回溜的速度必须满足项目配置的允许速度，否则将触发EB。如果回溜的距离超过项目配置的最大距离时，ATP应当触发无法缓解的永久EB。
+
+[iTC_CC_ATP-SwRS-0300]
+RollbackDistanceAccount_1，累计回溜的距离（负值表示在回溜）：
+?       初始化时设置该值为0；
+?       否则，如果列车运动学无效，则设置为配置参数的默认值；
+?       否则，在END_1激活且未选择RMR模式的前提下：
+-       若里程计已初始化，且列车向END_1方向运行，则累加最小位移，若超过0则取0，否则是一个负值。
+-       否则，若里程计齿数齿号匹配，则累加列车最大位移
+-       否则，即里程计未初始化，则保持累计距离不变。
+?       其他情况，保持累计距离不变。
+
+[iTC_CC_ATP-SwRS-0301]
+RollbackDistanceAccount_2，累计回溜的距离（负值表示在回溜）：
+?       初始化时设置该值为0；
+?       否则，如果列车运动学无效，则设置为配置参数的默认值；
+?       否则，在END_2激活且未选择RMR模式的前提下：
+-       若里程计已初始化，且列车向END_2方向运行，则减去最小位移，若超过0则取0，否则是一个负值。
+-       否则，若里程计已初始化，则减去列车最大位移
+-       否则，即里程计还未初始化，则保持累计距离不变。
+?       其他情况，保持累计距离不变。
+
+[iTC_CC_ATP-SwRS-0302]
+UnrecoverableRollbackOverSpeed，如果ATP检测到列车已经回退超过项目限制的最大距离，则设置永久回退超速
+
+[iTC_CC_ATP-SwRS-0303]
+RollbackOverSpeed，下列任一条件满足，认为回退超速
+?       若车头2激活，位移为END_1方向，未选择RMR模式
+-       车速大于当前回退距离所在限速
+?       若车头1激活，位移为END_2方向，未选择RMR模式
+-       车速大于当前回退距离所在限速
+?       列车运动学无效
+?       已发生了永久回退超速错误
+
+[iTC_CC_ATP-SwRS-0304]
+EBforRollbackOverSpeed，如果ATP检测到回溜超速，则输出EB
+
+[iTC_CC_ATP-SwRS-0759]
+LongDistanceReverseAuthorized，长距离倒车模式是否授权，其状态来自于项目可配置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0305]
+ReverseDistanceAccount_1，累加RMR模式下的倒车距离（负值表示倒车）：
+?       初始化时设置该值为0；
+?       否则，如果列车运动学无效，则设置为配置参数的默认值；
+?       否则，在END_1激活且非长距离倒车授权的前提下：
+-       若里程计已初始化，且列车向END_1方向运行，则减小倒车距离绝对值，大于零则等于0
+-       否则，如果里程计已初始化，且选择RMR模式，则累加倒车距离
+-       否则，即里程计还未初始化，则保持距离不变。
+?       其他情况，保持累计距离不变。
+
+[iTC_CC_ATP-SwRS-0306]
+ReverseDistanceAccount_2，累加RMR模式下的倒车距离（负值表示倒车）：
+?       初始化时设置该值为0；
+?       否则，如果列车运动学无效，则设置为配置参数的默认值；
+?       否则，在END_2激活且非长距离倒车授权的前提下：
+-       如果里程计已初始化，且列车向END_2方向运行，则减小倒车距离绝对值，大于零则等于0
+-       否则，如果里程计已初始化，且选择RMR模式时累加倒车距离
+-       否则，即里程计未初始化，则保持距离不变；
+?       其他情况，保持累计距离不变。
+
+[iTC_CC_ATP-SwRS-0753]
+ReverseSpeedRestrictions，根据当前计算的倒车累加距离在ATPsetting.ReverseLimit数组中索引的当前最大允许倒车速度。
+
+[iTC_CC_ATP-SwRS-0307]
+ReverseOverSpeed，超过RMR模式限速的条件：
+
+[iTC_CC_ATP-SwRS-0308]
+EBforReverseOverSpeed，由于RMR下倒车超速而导致EB
+
+[iTC_CC_ATP-SwRS-0262]
+TrainInterVPEZ_A，列车定位与A侧站台有交集；
+?       ATP初始化或者失位时，默认设置TrainInterVPEZ_A为False；
+?       当车身定位（即从车尾最小定位到车头最大定位）与站台区域（线路地图TrackMap中由一对方向相反的SGL_VPEZ奇点组成）有交集，且根据Table 512判断为A侧时，设置TrainInterVPEZ_A为True。
+?       其他情况，设置TrainInterVPEZ_A为False。
+
+
+[iTC_CC_ATP-SwRS-0263]
+TrainInterVPEZ_B，列车定位与B侧站台有交集；
+?       ATP初始化或者失位时，默认设置TrainInterVPEZ_B为False；
+?       当车身定位（即从车尾最小定位到车头最大定位）与站台区域（线路地图TrackMap中由一对方向相反的SGL_VPEZ奇点组成）有交集，且根据Table 512判断为B侧时，设置TrainInterVPEZ_B为True。
+?       其他情况，设置TrainInterVPEZ_B为False。
+
+
+[iTC_CC_ATP-SwRS-0560]
+VPEZid_A，与列车定位相交的A侧VPEZ的编号。
+?       如果TrainInterVPEZ_A为True，则记录该VPEZ的编号；
+?       否则，设置为None。
+
+[iTC_CC_ATP-SwRS-0561]
+VPEZid_B，与列车定位相交的B侧VPEZ的编号。
+?       如果TrainInterVPEZ_B为True，则记录该VPEZ的编号。；
+?       否则，设置为None。
+
+
+
+[iTC_CC_ATP-SwRS-0264]
+TrainIncludedInVPEZ_A，列车车身是否完全在A侧VPEZ区域内。
+?       初始化或者失位时，设置TrainIncludedInVPEZ_A为False；
+?       如果列车车身（即从车尾最小定位到车头最大定位）完全在VPEZid_A范围中，且TrainInterVPEZ_A为True，则设置TrainIncludedInVPEZ_A为True；
+?       否则，设置TrainIncludedInVPEZ_A为False.
+
+[iTC_CC_ATP-SwRS-0265]
+TrainIncludedInVPEZ_B，列车车身是否完全在B侧VPEZ区域内。
+?       初始化或者失位时，设置TrainIncludedInVPEZ_B为False；
+?       如果列车车身（即从车尾最小定位到车头最大定位）完全在VPEZid_B范围中，且该TrainInterVPEZ_B为True，则设置TrainIncludedInVPEZ_B为True；
+?       否则，设置TrainIncludedInVPEZ_B为False。
+
+[iTC_CC_ATP-SwRS-0576]
+TrainEmergencyBrakeApplied，列车是否施加了紧急制动。其状态来自于项目可配置的列车输入采集。
+
+
+[iTC_CC_ATP-SwRS-0073]
+TrainParkingBrakeApplied，任一端车头已施加停车制动，则认为停车制动已施加。其状态来自于项目可配置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0329]
+TrainSafelyImmobilised，判断是否已经安全停车
+
+[iTC_CC_ATP-SwRS-0737]
+NoVitalCorrectlyDocked，CCNV判断列车是否停在开门授权区内
+
+[iTC_CC_ATP-SwRS-0330]
+LocalATPenableDoorOpening_A，本ATP是否在站内允许开A侧车门：
+
+[iTC_CC_ATP-SwRS-0331]
+LocalATPenableDoorOpening_B，本ATP是否授权开启B侧车门：
+
+[iTC_CC_ATP-SwRS-0720]
+EnableDoorOpening_A，结合远端ATP结果的开门授权信息。
+
+[iTC_CC_ATP-SwRS-0721]
+EnableDoorOpening_B，结合远端ATP结果的开门授权信息。
+
+[iTC_CC_ATP-SwRS-0266]
+AlignPSDzone_A，列车定位与A侧PSD区有交集；
+PSDid_A，与列车定位有交集的A侧PSD的id号。
+?       ATP初始化或者失位时，默认设置AlignPSDzone_A为False，PSDid_A为None；
+?       当车身定位（即从车尾最小定位到车头最大定位）与屏蔽门区域（线路地图TrackMap中由一对方向相反的SGL_PSD_ZONE奇点组成）有交集，且根据Table 512判断为A侧时，设置AlignPSDzone_A为True，并将PSDid_A为设置为该SGL_PSD_ZONE奇点的id。
+?       其他情况，设置AlignPSDzone_A为False，PSDid_A为None。
+
+
+[iTC_CC_ATP-SwRS-0268]
+AlignPSDzone_B，列车定位与B侧PSD区有交集；
+PSDid_B，与列车定位有交集的B侧PSD的id号。
+?       ATP初始化或者失位时，默认设置AlignPSDzone_B为False，PSDid_B为None；
+?       当车身定位（即从车尾最小定位到车头最大定位）与屏蔽门区域（线路地图TrackMap中由一对方向相反的SGL_PSD_ZONE奇点组成）有交集，且根据Table 512判断为B侧时，设置AlignPSDzone_B为True，并将PSDid_B为设置为该SGL_PSD_ZONE奇点的id。
+?       其他情况，设置AlignPSDzone_B为False，PSDid_B为None。
+
+
+[iTC_CC_ATP-SwRS-0136]
+PSDoperation_A和PSDoperation_B，其结构为ST_PSD_OPERATION，用于获取来自CCNV的屏蔽门控制指令。
+
+[iTC_CC_ATP-SwRS-0467]
+CommunicateWithPSD，ATP根据CCNV的请求，判断是否与联锁建立通信。
+?       当本周期来自CCNV的PSDoperation_A或PSDoperation_B不全为None时，设置CommunicateWithPSD为True；
+?       否则，设置CommunicateWithPSD为False。
+
+
+[iTC_CC_ATP-SwRS-0111]
+初始化时，设置TableOfPSDPlatform数组中所有PSD的DoorClosed均为False，其有效期为0；此后，如果本周期收到正确的来自CI的CI_IOstatus消息时，根据其ID号，更新TableOfPSDPlatform数组中相应PSD的DoorClosed状态，并将DoorStatusValidityTime设为ATPsetting.PSDstatusValidityTime减去FSFB2消息传输延迟。
+
+
+[iTC_CC_ATP-SwRS-0112]
+如果本周期未收到来自CI的CI_IOstatus消息，或者该消息校验错误，则ATP更新TableOfPSDPlatform数组中的PSD的状态。即将DoorStatusValidityTime减1，如果该值已小于等于0，则将DoorClosed 设为False；否则保持DoorClosed不变。
+
+[iTC_CC_ATP-SwRS-0332]
+UsingPSDstatusFromCI，只有当列车定位与PSD区域有交集，且列车静止或刚发车时，ATP使用来自CI的PSD状态信息。
+
+[iTC_CC_ATP-SwRS-0134]
+MasterCCcore，来自CCNV的当前是否为主控CC信息
+
+[iTC_CC_ATP-SwRS-0155]
+PSDzoneStatus_A, 如果ATP所在为主控CC，则对A侧PSD状态的更新规则如下：
+
+[iTC_CC_ATP-SwRS-0532]
+PSDzoneStatus_B, 如果ATP所在为主控CC，则对B侧PSD状态的更新规则如下：
+
+[iTC_CC_ATP-SwRS-0533]
+如果ATP所在为备机CC，则对A侧PSD状态的更新规则如下：
+
+[iTC_CC_ATP-SwRS-0534]
+如果ATP所在为备机CC，则对B侧PSD状态的更新规则如下：
+
+[iTC_CC_ATP-SwRS-0722]
+PSDstatusNonVital_A，用于CCNV发送给DMI显示的A侧PSD状态
+
+[iTC_CC_ATP-SwRS-0723]
+PSDstatusNonVital_B，用于CCNV发送给DMI显示的B侧PSD状态
+
+[iTC_CC_ATP-SwRS-0333]
+PSDmanagerOrder_A，A侧PSD的控制命令信息，其结构为ST_PSD_MANAGE。其中如果来自CCNV的A侧PSD标识不等于ATP读取SGD中A侧的标识 ，则禁止使用CCNV的标识开门。
+
+[iTC_CC_ATP-SwRS-0334]
+PSDmanagerOrder_B，B侧PSD的控制命令信息，其结构为ST_PSD_MANAGE。其中如果来自CCNV的B侧PSD标识不等于ATP读取SGD中B侧的标识 ，则禁止使用来自CCNV的标识开门。
+
+[iTC_CC_ATP-SwRS-0335]
+PSDplatformManagerOpeningOrder，本ATP是否发了开门命令.
+
+[iTC_CC_ATP-SwRS-0336]
+PSDopeningCommand，本ATP或者冗余端ATP当前是否在发送开PSD命令.
+
+[iTC_CC_ATP-SwRS-0444]
+在与联锁通信时，如果PSDmanagerOrder_A.Id有效，则根据PSDmanagerOrder_A.Order和离线配置数据设置发送给A侧屏蔽门的控制信息CIsetting[0]。
+
+
+[iTC_CC_ATP-SwRS-0445]
+在与联锁通信时，如果PSDmanagerOrder_B.Id有效，则根据PSDmanagerOrder_B.Order和离线配置数据设置发送给B侧屏蔽门的控制信息CIsetting [1]。
+
+[iTC_CC_ATP-SwRS-0070]
+AllTrainDoorsClosedAndLocked，两端车头有任意一端采到TDCL，即认为两侧车门关闭并锁闭。
+
+[iTC_CC_ATP-SwRS-0337]
+InhibitControlTrainDoorsStatus，不监控车门状态.
+
+[iTC_CC_ATP-SwRS-0804]
+NoDangerForTrainDoorsNotClosedAndLocked，当列车停车，且与PSD区或VPEZ有交集时，且TDCL丢失，则该值为假；否则，该值为真。
+
+[iTC_CC_ATP-SwRS-0338]
+PBforTrainDoorsNotClosedAndLocked，列车停车，且车身与PSD区或VPEZ区域有交集时，车门未关时保持PB输出。
+
+[iTC_CC_ATP-SwRS-0339]
+EBforPBnotAppliedDueToTrainDoors，由于车门开而输出ZVRD，但未检测到ZVBA, 则ATP应当输出EB.
+
+[iTC_CC_ATP-SwRS-0340]
+NoDangerForDepartureWithoutTDCL，判断是否未处于上周期停车而本周期开始动车，且车门未关的条件。
+[iTC_CC_ATP-SwRS-0749]
+EBforDepartureWithoutTDCL，若ATP监控发车时丢失TDCL的情况，则输出EB。
+
+[iTC_CC_ATP-SwRS-0799]
+InhibitProtectionMovingWithoutTDCL，禁止监控非开门授权情况下车门打开的情形。
+
+[iTC_CC_ATP-SwRS-0800]
+NoDangerForMovingWithoutTDCL，监控非授权开门状态下车门打开
+
+[iTC_CC_ATP-SwRS-0801]
+EBforMovingWithoutTDCL，禁止监控非开门授权情况下车门打开的情形。
+
+[iTC_CC_ATP-SwRS-0341]
+InhibitControlPSDstatus，项目可配置不监控PSD状态的条件。
+
+[iTC_CC_ATP-SwRS-0342]
+AllPSDclosedAndLocked的判断，上周期或本周期停车，若有PSD且已获取其状态为关闭。
+
+[iTC_CC_ATP-SwRS-0750]
+NoDangerforUnexpectedPSDopening，判断在发车时是否PSD为开门状态.
+
+[iTC_CC_ATP-SwRS-0343]
+EBforUnexpectedPSDopening，PSD区域内刚发车时PSD门开，则输出EB.
+
+[iTC_CC_ATP-SwRS-0803]
+NoDangerForPSDnotClosedAndLocked，列车停在PSD区域，且PSD状态为限制时，该值为假；否则，该值为真。
+
+[iTC_CC_ATP-SwRS-0344]
+PBforPSDnotClosedAndLocked，车停在PSD区域内，PSD开，且未限制监控该功能时，要求输出ZVRD。
+
+[iTC_CC_ATP-SwRS-0345]
+EBforPBnotAppliedDueToPSD，由于PSD开而施加PB，但是未采到ZVBA。
+
+
+[iTC_CC_ATP-SwRS-0346]
+PSDopeningCommandValid，开门命令是否在有效期内.
+?       如果本周期PSDopeningCommand为True，则设置本周期PSDopeningCommandValid为True；
+?       否则如果上周期PSDopeningCommand为True而本周期变为False，则在接下来的ATPsetting. PSDopeningCommandValidityTime周 期内：
+-       如果PSDopeningCommand为False，仍保持PSDopeningCommandValid为True；
+-       如果PSDopeningCommand为True，则当其变为False后重新计时。
+?       其他情况，设置PSDopeningCommandValid为False。
+
+
+[iTC_CC_ATP-SwRS-0347]
+InhibitPSDopeningSupervisedByATP，是否禁止ATP监控发送屏蔽门开启指令时输出PB。
+
+[iTC_CC_ATP-SwRS-0348]
+PBforPSDopenedAndSupervisedByATP，在PSD开门过程中输出PB
+
+[iTC_CC_ATP-SwRS-0072]
+EmergencyHandleNotPulledEnd1，END_1逃生门未开。如果该项目未配置驾驶室的逃生门，则认为该逃生门未开。其状态来自于项目可配 置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0724]
+EmergencyHandleNotPulledEnd2，End_2逃生门未开。如果该项目未配置驾驶室的逃生门，则认为该逃生门未开。其状态来自于项目可配 置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0349]
+HoldDoorsClosedTrainEnd1，未拉END_1端驾驶室的逃生门紧急手柄，或者车在运动时，锁闭END_1端逃生门。
+
+
+[iTC_CC_ATP-SwRS-0350]
+HoldDoorsClosedTrainEnd2，未拉END_2端驾驶室的逃生门紧急手柄，或者车在运动时，锁闭END_2端逃生门。
+
+[iTC_CC_ATP-SwRS-0351]
+EBforNotAllTrainEndHoldDoorsClosed，驾驶室逃生门手柄拉下.
+
+[iTC_CC_ATP-SwRS-0738]
+EmergencyDetrainDoorLockingEnd1，要求车辆锁闭End1端驾驶室的紧急逃生门。
+
+[iTC_CC_ATP-SwRS-0739]
+EmergencyDetrainDoorLockingEnd2，要求车辆锁闭End2端驾驶室的紧急逃生门。
+
+[iTC_CC_ATP-SwRS-0273]
+EvacuationNotPossible_A，禁止A侧逃生。
+?       初始化或TrainLocatedOnKnownPath为False时，默认EvacuationNotPossible_A为False。
+?       否则，当车身定位（即从车尾最小定位到车头最大定位）与禁止逃生区（线路地图TrackMap中由一对方向相反的SGL_HAZAR_EVAC_ZONE奇点组成）范围有交集，且根据Table 512判断为A侧时，设置EvacuationNotPossible_A为True：
+?       其他情况，设置EvacuationNotPossible_A为False。
+
+
+[iTC_CC_ATP-SwRS-0274]
+EvacuationNotPossible_B，禁止B侧逃生。
+?       初始化或TrainLocatedOnKnownPath为False时，默认EvacuationNotPossible_B为False。
+?       否则，当车身定位（即从车尾最小定位到车头最大定位）与禁止逃生区（线路地图TrackMap中由一对方向相反的SGL_HAZAR_EVAC_ZONE奇点组成）范围有交集，且根据Table 512判断为B侧时，设置EvacuationNotPossible_B为True。
+?       其他情况，设置EvacuationNotPossible_B为False。
+
+
+[iTC_CC_ATP-SwRS-0352]
+HoldDoorsClosed_A，A侧车门锁闭.
+
+[iTC_CC_ATP-SwRS-0353]
+HoldDoorsClosed_B，B侧车门锁闭
+
+[iTC_CC_ATP-SwRS-0354]
+TrainDockedInStation，根据开门授权条件判断是否车停在站内。
+
+[iTC_CC_ATP-SwRS-0355]
+TrainLeavingStation，判断是否在离站过程中。
+?       从TrainDockedInStation由True变为False开始，如果列车测速有效，累加MaximumTrainMotion距离：
+-       如果其绝对值在[0, ATPsetting.EvacuationStationAreaLength]范围内，则设置TrainLeavingStation为True；否则为False。
+-       即如果列车出站后又倒车回到上述范围内，也应认为是TrainLeavingStation。
+?       如果列车运动学无效，则设置该值为False并清除累加距离。
+
+[iTC_CC_ATP-SwRS-0071]
+EmergencyHandleNotPulledSide侧向的紧急手柄未落下。其状态来自于项目可配置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0356]
+EvacuationWhileLeavingStation，未完全出站时丢失车门状态则EB.
+
+[iTC_CC_ATP-SwRS-0357]
+EvacuationWithTrainStopped，非开门区，停车且乘客紧急手柄拉下
+
+[iTC_CC_ATP-SwRS-0726]
+InhibitProtectionEvacuationInDistance，在离站时禁止监控逃生手柄状态
+
+[iTC_CC_ATP-SwRS-0727]
+InhibitProtectionEvacuationWithStop，在站间停车时禁止监控逃生手柄状态。
+
+[iTC_CC_ATP-SwRS-0358]
+EBforEvacuationWhileTrainLeavingStation，出站时的逃生请求EB.
+
+[iTC_CC_ATP-SwRS-0748]
+EBforEvacuationWithTrainStopped，站间停车时的逃生请求EB.
+
+[iTC_CC_ATP-SwRS-0133]
+PBforOperationalRequest，来自CCNV的ZVRD输出请求
+
+[iTC_CC_ATP-SwRS-0359]
+TrainParkingBrakeRequested，判断本周期是否需要施加停车制动。条件如下：
+?       由于moral time 导致需要输出停车制动；
+?       或者，由于超能导致需要输出停车制动；
+?       或者，由于在PSD区域内车门未关闭而导致需要输出停车制动；
+?       或者，由于NUDE导致需要输出停车制动；
+?       或者，CCNV请求需要输出停车制动；
+?       或者，由于PSD未关闭而导致需要输出停车制动
+?       或者，本周期已请求EB输出。
+
+
+[iTC_CC_ATP-SwRS-0360]
+InhibitParkingBrake，当前不施加停车制动。
+
+[iTC_CC_ATP-SwRS-0556]
+IncompatibleDistantATP，判断本ATP与冗余ATP之间的Coreld和SubSystemID是否相匹配。当初始化，冗余ATP信息不可用，或者冗余ATP 读取的Dataplug中的SSID与本ATP相一致而Coreld不一致时，认为两端ATP相互匹配；否则，ATP将触发紧急制动。
+
+
+[iTC_CC_ATP-SwRS-0271]
+ApproachableSignalOverrun，本周期列车车头最大定位是否冒进可接近信号机。
+?       当满足以下所有条件时，ATP认为列车冒进了可接近信号机，则设置ApproachableSignalOverrun为True；
+-       当前未选择MotionProtectionInhibition；
+-       上周期ApproachableSignalOverrun为False；
+-       本周期列车位移MaximumTrainMotion向激活的驾驶室方向运行；
+-       本周期列车车头最大定位TrainFrontLocation经过了一个带OVERLAP的信号机奇点；
+-       该信号机变量状态是限制而其所带Overlap已建立（Overlap状态建立的条件见Table 59）。
+?       否则，设置ApproachableSignalOverrun为False。
+
+[iTC_CC_ATP-SwRS-0132]
+EBforOperationalRequest，来自CCNV的EB输出请求
+
+[iTC_CC_ATP-SwRS-0361]
+TrainEmergencyBrakeRequested，判断本周期是否需要施加EB。
+
+[iTC_CC_ATP-SwRS-0362]
+InhibitEmergencyBrake，输出和缓解EB的条件
+
+[iTC_CC_ATP-SwRS-0546]
+CCworkOvertime，监控CC是否连续工作超过MAX_RESET_TIME时间(该时间小于MAX_ATP_LOOP_HOUR)。如果CC运行超过MAX_RESET_TIME时间 ，则ATP需将所有对VIOM输出的端口置为限制状态。
+
+[iTC_CC_ATP-SwRS-0584]
+VIOM1OutNotDisabled，VIOM2OutNotDisabled，CCNV请求“非禁止安全输出”。
+?       当来自CCNV的消息无效时，应设置CCNV请求的“非禁止安全输出”为限制状态；
+?       否则，根据CCNV发送的状态字进行设置。
+
+[iTC_CC_ATP-SwRS-0465]
+VIOM1VitalOut，VIOM2VitalOut，ATP输出给VIOM的车辆安全控制命令。
+?       对于每一个端口的具体含义，是由项目配置的。ATP支持的可配置端口如Table 514所示。
+?       只有当CC未工作超时且CCNV未禁止该端口输出时，才能根据ATP计算结果输出该端口；否则，ATP默认该端口为限制状态。
+
+[iTC_CC_ATP-SwRS-0455]
+根据[REF5]，在ATP发送给VIOM的命令中还应附加当前时间ATPtime，上下CPU模块的周期同步校核字Trace和Dt，安全时钟状态SafeTimerFailed，是否主控CC信息MasterCCcore，以及需要反馈给各自VIOM的时间信息LatestVIOM1LoopHourVIOM[2]和LatestVIOM2LoopHourVIOM[2]。
+
+[iTC_CC_ATP-SwRS-0752]
+OutOfCode，ATP计算输出给VIOM的消息后，需要进行VIOM消息的VCP签名检测，用于维护诊断。
+?       如果检测出签名有误，或上周期该值已经为True，则保持设置OutOfCode为True，表明ATP系统错误，此时需在VLE前面板LED显示ERR_OUT_CODE信息；
+?       否则，设置OutOfCode为False。
+
+
+[iTC_CC_ATP-SwRS-0401]
+TrainHeadOrientation，ATP需将车头最小定位的运营方向作为列车运营方向发送给ZC。规则见SwRS-0403。
+
+[iTC_CC_ATP-SwRS-0403]
+TrainHeadMinLocation，车头最小定位位置。
+根据[REF5]，在LocReport中的坐标单位为0.5米，因此需进行单位转换。转换时应当向列车的“后方”即上游方向取整。
+?       如果列车失位，则设置相关定位信息为无效值；
+?       否则，如果列车向UP方向运行，则：
+-       车头最小定位所在BLOCK号不变；
+-       车头最小定位所在坐标以0.5米为单位向下取整；
+-       车头方向为LOCREPORT_DIRECTION_UP。
+?       否则，如果车头最小定位坐标加0.5米小于该BLOCK长度，则：
+-       车头最小定位所在BLOCK号不变；
+-       车头最小定位所在坐标以0.5米为单位向上取整；
+-       车头方向为LOCREPORT_DIRECTION_DOWN。
+?       否则，如果车头最小定位所在BLOCK，与该BLOCK的UP方向下个BLOCK之间存在灯泡线极点，则：
+-       车头最小定位所在BLOCK需改为其UP方向的下个BLOCK；
+-       车头最小定位所在坐标为下个BLOCK长度以0.5米为单位向下取整；
+-       车头方向为LOCREPORT_DIRECTION_UP。
+?       否则：
+-       车头最小定位所在BLOCK需改为其UP方向的下个BLOCK；
+-       车头最小定位所在坐标为0；
+-       车头方向为LOCREPORT_DIRECTION_DOWN。
+
+[iTC_CC_ATP-SwRS-0404]
+TrainHeadCoupledStatus，车头连挂状态。
+
+[iTC_CC_ATP-SwRS-0405]
+TrainTailCabId，车尾ID号。
+
+[iTC_CC_ATP-SwRS-0406]
+TrainTailOrientation，ATP需将车尾最小定位的运营方向发送给ZC，作为车位运营方向。规则见SwRS-0408。
+
+[iTC_CC_ATP-SwRS-0408]
+TrainTailMinLocation，车尾最小定位所在位置。
+根据[REF5]，在LocReport中的坐标单位为0.5米，因此需进行单位转换。转换时应当导向ZC处理的安全侧，偏向将列车包络定位“拉长”，即向列车的上游方向取整。
+?       如果列车失位，设置上述定位信息为0；
+?       否则，如果列车车尾朝DOWN方向，则：
+-       车尾最小定位所在BLOCK号不变；
+-       车尾最小定位所在坐标以0.5米为单位向下取整；
+-       车尾方向为LOCREPORT_DIRECTION_DOWN。
+?       否则，如果车尾最小定位坐标加0.5米小于该BLOCK长度，则：
+-       车尾最小定位所在BLOCK号不变；
+-       车尾最小定位所在坐标以0.5米为单位向上取整；
+-       车尾方向为LOCREPORT_DIRECTION_UP。
+?       否则，如果车尾最小定位所在BLOCK找不到UP方向的下个BLOCK，则：
+-       车尾最小定位所在BLOCK号不变，
+-       车尾最小定位所在坐标以0.5米为单位向上取整（此时由于发送的坐标超过了Block长度，ZC会将本LocReport丢弃，不会影响安 全）。
+-       车尾方向为LOCREPORT_DIRECTION_UP。
+?       否则，如果车尾最小定位所在BLOCK，与该BLOCK的UP方向下个BLOCK之间存在灯泡线极点，则：
+-       车尾最小定位所在BLOCK需改为其上行方向的下个BLOCK；
+-       车尾最小定位所在坐标为下游BLOCK长度以0.5米为单位向下取整；
+-       车尾方向为LOCREPORT_DIRECTION_DOWN。
+?       否则，
+-       车尾最小定位所在BLOCK需改为其上行方向的下个BLOCK；
+-       车尾最小定位所在坐标为0；
+-       车尾方向为LOCREPORT_DIRECTION_UP。
+
+[iTC_CC_ATP-SwRS-0409]
+TrainTailCoupledStatus，车尾连挂状态。
+
+[iTC_CC_ATP-SwRS-0410]
+LocationError，最大最小定位误差. 根据[REF5]，在LocReport中的长度单位是0.5米，因此需进行转换，转换时应当导向安全侧。
+
+[iTC_CC_ATP-SwRS-0068]
+RouteSetNotNeededSendable，是否可以发送RSNN信息。其状态来自于项目可配置的列车输入采集。
+
+[iTC_CC_ATP-SwRS-0135]
+NonVitalRouteSetNotNeeded，RSNN状态
+
+[iTC_CC_ATP-SwRS-0414]
+TrainRouteSetNotNeeded，是否发送RSNN信息。
+
+[iTC_CC_ATP-SwRS-0415]
+TrainCorrectDocking，列车是否正确停靠车站。
+
+[iTC_CC_ATP-SwRS-0416]
+LocReportSpeed，列车最大速度，需转换为CC-ZC接口协议中的单位，并向上取整。
+
+[iTC_CC_ATP-SwRS-0417]
+TrainMonitoringMode，监控模式.
+
+[iTC_CC_ATP-SwRS-0599]
+SignalOverrideSendable，发给ZC的关信号机命令。
+
+[iTC_CC_ATP-SwRS-0418]
+SignalsOverride，是否CBTC下取消信号。
+
+[iTC_CC_ATP-SwRS-0598]
+ATCcontrolledTrain，ATP未被切除。
+
+[iTC_CC_ATP-SwRS-0728]
+DateSynchronizationReceived，收到时钟同步消息
+
+[iTC_CC_ATP-SwRS-0094]
+DateSynchronisationReportAvailable用于判断当前周期收到的LC安全时间消息是否可用。当满足以下条件时，设置DateSynchronisationReportAvailable为True。否则，设置DateSynchronisationReportAvailable为False。
+?       本周期收到来自LC的DateSynchronizationReport消息，并且校核字正确；
+?       如果收到LC消息是LC应答本端CC发出的消息，且满足以下条件时:
+-       当前ATP时间应大于消息中所带的ccLoopHour;
+-       并且当前ATP时间与消息中所带的ccLoopHour的差值应当小于之前ATP使用的LC消息时间。
+?       如果该消息是LC应答远端CC发出的消息，则应满足以下条件:
+-       当前ATP维护的远端ATP最小时间应大于消息中所带的ccLoopHour;
+-       并且当前ATP维护的远端ATP最大时间时间与消息中所带的ccLoopHour的差值，应当小于之前ATP使用的LC消息时间。
+
+[iTC_CC_ATP-SwRS-0095]
+LastSynchronisationReportAge，记录从上次收到LC消息到现在的时间。用于在新收到LC消息时，比较该“新”消息是否的确比之前的消息“新”。即防止在网络传输中发生消息逆序的情况。
+
+[iTC_CC_ATP-SwRS-0097]
+LCsynchronisationLoopHourValid，每周期更新LC消息是否还在有效期内。
+
+[iTC_CC_ATP-SwRS-0098]
+对于线路上的LC，ATP需要维护其时间信息GroundTimeReference，结构为ST_GROUND_TIME：
+以轨旁周期号为单位的时间
+以毫秒为单位累加轨旁时间
+
+时间信息更新规则如下：
+?       LC消息无效时，设为默认值；
+?       本周期收到新的可用的LC消息时，更新为消息中的时间；
+?       否则根据车载和轨旁周期的比值进行累加更新
+
+[iTC_CC_ATP-SwRS-0437]
+EnableSendLocReport，当所对应的LC消息在有效期内时，才允许给ZC发送位置报告。
+
+[iTC_CC_ATP-SwRS-0438]
+TimeElapseBetweenTwoLocReport，计算发送LocReport的时间控制：
+
+[iTC_CC_ATP-SwRS-0439]
+ZCidUnderTrainTail，车尾定位所在的ZC标识.
+
+[iTC_CC_ATP-SwRS-0440]
+ZCidUnderTrainHead，车头定位的ZC标识
+
+[iTC_CC_ATP-SwRS-0441]
+SendLocReportOnZCunderTrainTail，当距离上次发送LocReport到达既定时间，且车头和车尾不是同一个ZC时，要给车尾所在的ZC发送消息
+
+[iTC_CC_ATP-SwRS-0442]
+SendLocReportOnZCunderTrainHead，是否给车头的ZC区发LocReport。
+
+[iTC_CC_ATP-SwRS-0729]
+CCvariantRequestMsgReceived，收到来自CI的CC变量请求并校核字正确。
+
+[iTC_CC_ATP-SwRS-0730]
+ReceivedCBIloopHour，记录CBI请求中的联锁的loop hour。
+
+[iTC_CC_ATP-SwRS-0731]
+CCvariants，ATP发送给联锁的Overlap解锁信息。
+
+[iTC_CC_ATP-SwRS-0511]
+初始化时，ATP读取带VCP编码的来自CC data plug接口的信息CCdataPlugInfo，生成DataPlugContent，其结构如Table 44所示。
+
+[iTC_CC_ATP-SwRS-0037]
+初始化时，ATP软件通过DataPlugContent.VLECpuId来识别所在的是CPU1还是CPU2，并与另一个CPU模块建立通信。
+?       如果从Dataplug读到的cpuId错误，则导致双CPU建立通信失败，ATP软件禁止执行，等待操作人员手动重启系统；
+-       对于CPU1，将在等待双CPU建立通信时控制LED显示WAITING_CPU信息。
+-       对于在CPU1运行的ATP软件，如果读到的cpuId既不是CPU1也不是CPU2时，控制LED显示ERR_CPU_ID信息。
+
+[iTC_CC_ATP-SwRS-0056]
+初始化时，ATP软件需将来自DataPlugContent的部分内容，如Table 47所示，在与CCNV建立通信后通过双口RAM发送给CCNV。如果ATP软件无法与CCNV建立通信，则保持等待，由CPU1在LED上显示WAITING _CCNV，直到通信建立成功或者操作人员重启VLE-2板。
+
+[iTC_CC_ATP-SwRS-0512]
+初始化时，ATP软件需将来自CC data plug的DataPlugContent.DLUIpBlue和DLUIpRed信息通过双口RAM发送给DLU。
+
+[iTC_CC_ATP-SwRS-0039]
+初始化相关硬件，如VPB板，若硬件初始化成功则继续执行；若失败，则CPU1的ATP软件在LED上显示ERR_INIT_VPB信息，并禁止软件继续 执行，等待操作人员手动重启系统。
+
+[iTC_CC_ATP-SwRS-0591]
+初始化时，ATP上下CPU模块应当比较读取自VPB板的CBKWrite. SensorReg, CogCounterReg, CalibrationReg, StatusReg寄存器初值是否相同。若相同则继续执行，否则，应在LED上显示UNCONST_VPB信息，并禁止软件继续执行。
+
+[iTC_CC_ATP-SwRS-0045]
+VLEimpulseNb[ATP_INTERRUPT_NB]，存储每次触发中断时获取的VLE脉冲数。ATP软件在每次响应安全时钟的硬件中断后，需通过VLE_GetSafeTime接口获取VLE的脉冲数，将其存储在VLEimpulseNb数组中。
+
+[iTC_CC_ATP-SwRS-0756]
+ATP上电后，在每次响应中断后将ImmediateCounter加1，作为中断计数器。
+
+
+
+[iTC_CC_ATP-SwRS-0046]
+定时中断被激活后，在每次中断中对ImmediateNb，CycleSynchronized，Trace，Dt和CycleBiasNb进行更新：
+?       如果当前是上电后第一个中断：ATP需设置ImmediateNb为0，并根据所在的CPU初始化Trace，VCP的时间标签Dt，以及中间变量m ：
+?       否则，如果ImmediateNb = 0，而VitalTime与上个中断相比仍然未发生变化，则
+-       将CycleBiasNb加1。
+-       如果CycleBiasNb > 1，设置CycleSynchronized为False；
+?       否则，如果ImmediateNb = 0，而VitalTime与上个中断相比发生了变化，则
+-       令ImmediateNb = 1；
+-       令Trace = PDoperationDt(Trace，Bi[ImmediateNb], Dt)
+-       设置CycleBiasNb = 0，而且CycleSynchronized为True.
+-       使用LockedImmediateCounter锁存此时的ImmediateCounter值，作为新周期初始的中断号。
+?       否则，
+-       将ImmediateNb的值加1；
+-       令Trace = PDoperationDt(Trace, Bi[ImmediateNb], Dt)；
+-       如果ImmediateNb > (ATP_INTERRUPT_NB-1)，则设置ImmediateNb = 0；并令Trace = PDoperation(Trace，m)，令Dt = PDoperation(Dt, 0)
+
+
+[iTC_CC_ATP-SwRS-0535]
+SafeTimerFailed，判断硬件定时中断是否正确。在主任务中检查每个相邻中断中锁存的VLE安全时钟脉冲数是否在误差范围[MIN_TIMER_IMPULSE_NB, MAX_TIMER_IMPULSE_NB]内。
+?       一旦判断SafeTimerFailed为True，则始终保持为True（只有重启ATP才能缓解）；
+?       否则，若测得脉冲数在上述范围内，则设置SafeTimerFailed为False;
+?       否则，设置SafeTimerFailed为True。
+
+[iTC_CC_ATP-SwRS-0047]
+VitalTime，ATP主任务维护的当前周期序号。上电后从0开始，每周期递增加1。当主任务在执行完成本周期的所有工作后，监控中断任务是否执行完成，即ImmediateCounter和LockedImmediateCounter的差值是否大于等于（ATP_INTERRUPT_NB -1）：
+?       若是，则表明主周期执行完成：
+-       将VitalTime送给另一个CPU模块；
+-       将Trace(k)和Dt(k)作为校核字送给VIOM进行校验。
+-       在本周期最后，设置
+?       否则，继续等待。
+
+
+[iTC_CC_ATP-SwRS-0048]
+当满足下列条件时，执行新的主周期：
+?       and TOC_VitalTime == VitalTime(k)，表示另一个CPU执行已执行完成上个周期的任务。
+如果不满足上述条件，则不允许执行新周期，CPU1的ATP在VLE板的LED上显示ERR_SYNCH信息。
+
+
+[iTC_CC_ATP-SwRS-0589]
+为确保ATP与CCNV的周期同步，ATP应当每CCNV_CYCLE_TIME触发一次DVCOM-2板的中断。
+
+[iTC_CC_ATP-SwRS-0446]
+RTCtime，ATP维护的非安全时钟：
+?       ATP软件在初始化时从VLE-2后板上获取RTC时钟信息；
+?       之后，ATP软件每秒钟将该RTC时钟加1；
+?       但如果RTC时钟与来自CCNV的NTP时间差超过MAX_NTP_TIME_ERROR，则使用NTP时间更新RTC时间。
+其中Time.Update()意为ATP软件每秒钟将RTC时间加1。
+
+[iTC_CC_ATP-SwRS-0050]
+车载ATP软件在每个周期运行时，需要将VLE-2板两个CPU模块生成的安全输出命令合并组成一帧后发送给CCNV，由其转发给VIOM。在每周 期生成运算结果后，ATP软件通过双口RAM将运算结果VIOM1VitalOut和VIOM2VitalOut发送给另一个CPU，并获取来自另一个CPU的运算结果TOC_VIOM1VitalOut和TOC_VIOM2VitalOut。
+
+[iTC_CC_ATP-SwRS-0051]
+车载ATP软件将VIOM1VitalOut和TOC_VIOM1VitalOut按照ST_VIOM_OUT结构组合成IdenticalVIOM1Out，将VIOM2VitalOut和TOC_VIOM2VitalOut按照ST_VIOM_OUT结构组合成IdenticalVIOM2Out。
+
+[iTC_CC_ATP-SwRS-0579]
+IdenticalLocReport，ATP两CPU同步后的发送给ZC的位置报告信息。当两CPU各自计算完成LocReport后，需将其通过双口RAM发送给对方 ；并接收来自对方的TOC_LocReport，共同组成IdenticalLocReport，再发送给CCNV，由其转发给ZC。IdenticalLocReport的生成规则如 下：
+?       ST_LOC_REPORT中除两重SACEM校核字外，其余均采用本CPU的计算结果；
+?       对于VitalChecksum_1，采用CPU1的数据进行计算；
+?       对于VitalChecksum_2，采用CPU2的数据进行计算。
+
+[iTC_CC_ATP-SwRS-0580]
+IdenticalVersionReport，ATP两CPU同步后的发送给LC的版本报告信息。
+当两CPU各自计算完成VersionFromCCreport后，需将其通过双口RAM发送给对方；并接收来自对方的TOC_VersionReport，组合生成IdenticalVersionReport，再发送给CCNV，由其转发给LC。IdenticalVersionReport的生成规则如下：
+?       ST_VERSION_REPORT中除安全校核字外，其余变量均采用本CPU的计算结果；
+?       对于VitalChecksum_1，采用CPU1的数据进行计算；
+?       对于VitalChecksum_2，采用CPU2的数据进行计算。
+
+
+[iTC_CC_ATP-SwRS-0581]
+IdenticalCCsyncReport，ATP两CPU同步后的发送给冗余ATP的同步信息。
+当两CPU各自计算完成CCsynchroReport后，需将其通过双口RAM发送给对方；并接收来自对方的TOC_CCsyncReport组合生成IdenticalCCsyncReport，再发送给CCNV，由其转发给冗余ATP。IdenticalCCsyncReport的生成规则如下：
+?       ST_SYNCHRO_REPORT中除安全校核字外，其余变量均采用本CPU的计算结果；
+?       对于VitalChecksum_1，采用CPU1的数据进行计算；
+?       对于VitalChecksum_2，采用CPU2的数据进行计算。
+
+[iTC_CC_ATP-SwRS-0588]
+IdenticalCIsetting[MAX_CONNECTED_PSD_NB],ATP两CPU同步后的发送给联锁PSD控制命令。
+当两CPU各自计算完成CIsetting后，需将其通过双口RAM发送给对方；并接收来自对方的TOC_CIsetting组合生成IdenticalCIsetting，再发送给CCNV，由其转发给冗余ATP。IdenticalCIsetting的生成规则如下：
+?       ST_CI_SETTING除校核字外的变量，采用本CPU的计算结果；
+?       对于FSFB2通信协议中的校核字1，采用CPU1的数据进行计算；
+?       对于FSFB2通信协议中的校核字2，采用CPU2的数据进行计算。
+
+[iTC_CC_ATP-SwRS-0746]
+IdenticalCBIvariantRequest，ATP两CPU同步后的发送给联锁的变量请求信息。
+当两CPU各自计算完成CBIvariantRequest后，需将其通过双口RAM发送给对方；并接收来自对方的TOC_CBIvariantRequest组合生成IdenticalCBIvariantRequest，再发送给CCNV，由其转发给联锁。IdenticalCBIvariantRequest的生成规则如下：
+?       除安全校核字外，均采用本CPU的计算结果；
+?       对于VitalChecksum_1，采用CPU1的数据进行计算；
+?       对于VitalChecksum_2，采用CPU2的数据进行计算。
+
+
+[iTC_CC_ATP-SwRS-0747]
+IdenticalCCvariantReport，ATP两CPU同步后的发送给联锁的Overlap解锁信息。
+当两CPU各自计算完成CCvariantReport后，需将其通过双口RAM发送给对方；并接收来自对方的TOC_CCvariantReport组合生成IdenticalCCvariantReport，再发送给CCNV，由其转发给联锁。IdenticalCCvariantReport的生成规则如下：
+?       除安全校核字外，均采用本CPU的计算结果；
+?       对于VitalChecksum_1，采用CPU1的数据进行计算；
+?       对于VitalChecksum_2，采用CPU2的数据进行计算。
